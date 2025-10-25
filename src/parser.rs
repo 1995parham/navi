@@ -4,8 +4,8 @@ use crate::finder::structures::{Opts as FinderOpts, SuggestionType};
 use crate::prelude::*;
 use crate::structures::cheat::VariableMap;
 use crate::structures::item::Item;
-use std::io::Write;
 use std::env;
+use std::io::Write;
 
 lazy_static! {
     pub static ref VAR_LINE_REGEX: Regex = Regex::new(r"^\$\s*([^:]+):(.*)").expect("Invalid regex");
@@ -170,7 +170,8 @@ fn should_show_for_path(path_filter: &Option<String>) -> bool {
             };
 
             // Split by comma and check if any pattern matches
-            filter.split(',')
+            filter
+                .split(',')
                 .map(|p| p.trim())
                 .any(|pattern| matches_path_pattern(&current_dir, pattern))
         }
@@ -451,7 +452,10 @@ mod tests {
         assert!(matches_path_pattern("/var/lib/projects", "**/projects"));
         assert!(matches_path_pattern("/home/user/code/projects", "**/projects"));
         assert!(matches_path_pattern("/home/user/projects/sub", "**/projects/**"));
-        assert!(matches_path_pattern("/home/user/projects/sub/deep", "**/projects/**"));
+        assert!(matches_path_pattern(
+            "/home/user/projects/sub/deep",
+            "**/projects/**"
+        ));
 
         // Test wildcard in middle
         assert!(matches_path_pattern("/home/user/git-repo", "**/git-*"));
@@ -481,7 +485,10 @@ mod tests {
         assert!(should_show_for_os(&Some(format!("!{}", other_os))));
 
         // Multiple values with current OS
-        assert!(should_show_for_os(&Some(format!("{}, windows, macos", current_os))));
+        assert!(should_show_for_os(&Some(format!(
+            "{}, windows, macos",
+            current_os
+        ))));
 
         // Multiple values without current OS
         let filter = if current_os == "linux" {
