@@ -1,6 +1,6 @@
 <div align="center">
-<h1>navi</h1>
-<img src="https://raw.githubusercontent.com/1995parham/navi/main/assets/icon.png" alt="icon" height="28px"/>
+  <h1>navi</h1>
+  <img src="https://raw.githubusercontent.com/1995parham/navi/main/assets/icon.png" alt="icon" height="28px"/>
 </div>
 
 An interactive cheatsheet tool for the command-line.
