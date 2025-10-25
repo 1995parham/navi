@@ -1,6 +1,9 @@
 <div align="center">
   <h1>navi</h1>
   <img src="https://raw.githubusercontent.com/1995parham/navi/main/assets/icon.png" alt="icon" height="28px"/>
+  <br>
+  <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/1995parham/navi/ci.yml?style=for-the-badge&logo=github&label=CI">
+  <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/1995parham/navi/cd.yml?style=for-the-badge&logo=github&label=Publish">
 </div>
 
 An interactive cheatsheet tool for the command-line.
