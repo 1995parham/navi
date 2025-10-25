@@ -17,6 +17,7 @@ fn prompt_finder(
     suggestion: Option<&Suggestion>,
     variable_count: usize,
     preview_context_env_vars: &std::collections::HashMap<String, String>,
+    variable_cache: &std::collections::HashMap<String, String>,
 ) -> Result<String> {
     let mut preview_env_vars = preview_context_env_vars.clone();
     let mut extra_preview: Option<String> = None;
@@ -40,7 +41,9 @@ fn prompt_finder(
         }
 
         let mut cmd = shell::out();
-        cmd.stdout(Stdio::piped()).arg(suggestion_command);
+        cmd.stdout(Stdio::piped())
+            .arg(suggestion_command)
+            .envs(variable_cache);
         debug!(cmd = ?cmd);
         let child = cmd
             .spawn()
@@ -195,6 +198,7 @@ fn replace_variables_from_snippet(
                 Some(&new_suggestion),
                 variable_count,
                 preview_context_env_vars,
+                &variable_cache,
             )?
         } else {
             prompt_finder(
@@ -202,6 +206,7 @@ fn replace_variables_from_snippet(
                 None,
                 variable_count,
                 preview_context_env_vars,
+                &variable_cache,
             )?
         };
 
