@@ -1,11 +1,20 @@
 use crate::commands;
 use crate::finder::FinderChoice;
 
-use clap::{Parser, Subcommand, crate_version};
+use clap::{Parser, Subcommand, crate_authors, crate_version};
 
 #[derive(Debug, Parser)]
-#[command(after_help = "\x1b[0;33mMORE INFO:\x1b[0;0m
-    Please refer to \x1b[0;32mhttps://github.com/denisidoro/navi\x1b[0;0m
+#[command(
+    name = "navi",
+    version = crate_version!(),
+    author = crate_authors!("\n"),
+    about = "An interactive cheatsheet tool for the command-line",
+    long_about = "navi allows you to browse through cheatsheets (that you may write yourself or \
+                  download from maintainers) and execute commands. Suggested values for arguments \
+                  are dynamically displayed in a list.",
+    help_template = "{name} {version}\n{author-with-newline}{about-with-newline}\n{usage-heading} {usage}\n\n{all-args}{after-help}",
+    after_help = "\x1b[0;33mMORE INFO:\x1b[0;0m
+    Please refer to \x1b[0;32mhttps://github.com/1995parham/navi\x1b[0;0m
 
 \x1b[0;33mENVIRONMENT VARIABLES:\x1b[0m
     \x1b[0;32mNAVI_CONFIG\x1b[0;0m            # path to config file
@@ -37,7 +46,6 @@ use clap::{Parser, Subcommand, crate_version};
     navi --fzf-overrides '--nth 1,2'             # only consider the first two columns for search
     navi --fzf-overrides '--no-exact'            # use looser search algorithm
     navi --tag-rules='git,!checkout'             # show non-checkout git snippets only")]
-#[clap(version = crate_version!())]
 pub(super) struct ClapConfig {
     /// Colon-separated list of paths containing .cheat files
     #[arg(short, long)]
