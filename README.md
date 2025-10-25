@@ -38,10 +38,6 @@ brew install navi
 > [!NOTE]
 > For more details on how to install Navi, see [docs/installation](docs/installation/README.md)
 
-**navi** can be installed with the following package managers:
-
-[![Packaging status](https://repology.org/badge/vertical-allrepos/navi.svg)](https://repology.org/project/navi/versions)
-
 ## Usage
 
 There are multiple ways to use **navi**:
