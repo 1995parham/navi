@@ -1,4 +1,7 @@
-# navi <img src="https://raw.githubusercontent.com/denisidoro/navi/master/assets/icon.png" alt="icon" height="28px"/> [![Actions Status](https://github.com/denisidoro/navi/workflows/CI/badge.svg)](https://github.com/denisidoro/navi/actions) ![GitHub release](https://img.shields.io/github/v/release/denisidoro/navi?include_prereleases)
+<div align="center">
+<h1>navi</h1>
+<img src="https://raw.githubusercontent.com/1995parham/navi/main/assets/icon.png" alt="icon" height="28px"/>
+</div>
 
 An interactive cheatsheet tool for the command-line.
 
