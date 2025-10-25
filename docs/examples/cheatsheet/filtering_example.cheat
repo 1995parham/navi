@@ -1,0 +1,89 @@
+% filtering, examples
+
+# ============================================
+# PATH-BASED FILTERING EXAMPLES
+# ============================================
+
+# Show git status (only in git repositories)
+; path: **/.git/**, **/git-*/**
+git status
+
+# Show project build command (only in project directories)
+; path: **/projects/**, **/workspace/**
+make build
+
+# Show docker commands (only in specific docker directories)
+; path: **/docker/**, **/containers/**
+docker ps -a
+
+# ============================================
+# OS-BASED FILTERING EXAMPLES
+# ============================================
+
+% package-manager, linux
+
+; os: linux
+# Update system packages with apt (Linux only)
+sudo apt update && sudo apt upgrade
+
+% package-manager, macos
+
+; os: macos
+# Update system packages with brew (macOS only)
+brew update && brew upgrade
+
+% package-manager, windows
+
+; os: windows
+# Update system packages with winget (Windows only)
+winget upgrade --all
+
+% file-permissions
+
+; os: !windows
+# Make script executable (all OSes except Windows)
+chmod +x <script_name>
+
+$ script_name: ls *.sh *.py *.rb --- --column 1
+
+% clipboard
+
+; os: linux
+# Copy to clipboard on Linux
+echo "<text>" | xclip -selection clipboard
+
+; os: macos
+# Copy to clipboard on macOS
+echo "<text>" | pbcopy
+
+; os: windows
+# Copy to clipboard on Windows
+echo "<text>" | clip
+
+$ text: echo "Sample text"
+
+% network, linux
+
+; os: linux
+# Show network interfaces (Linux only)
+ip addr show
+
+% network, macos
+
+; os: macos
+# Show network interfaces (macOS only)
+ifconfig
+
+% combined-filters
+
+; path: **/projects/**
+; os: linux
+# Run Linux-specific project tests (only in project dirs on Linux)
+./run_linux_tests.sh
+
+; path: **/web/**
+; os: !windows
+# Deploy web app (only in web directories, not on Windows)
+./deploy.sh <environment>
+
+$ environment: echo -e "development\nstaging\nproduction" --- --prevent-extra

@@ -5,6 +5,7 @@ use crate::prelude::*;
 use crate::structures::cheat::VariableMap;
 use crate::structures::item::Item;
 use std::io::Write;
+use std::env;
 
 lazy_static! {
     pub static ref VAR_LINE_REGEX: Regex = Regex::new(r"^\$\s*([^:]+):(.*)").expect("Invalid regex");
@@ -137,6 +138,75 @@ fn without_first(string: &str) -> String {
         .to_string()
 }
 
+fn get_current_os() -> String {
+    std::env::consts::OS.to_string()
+}
+
+fn matches_path_pattern(current_dir: &str, pattern: &str) -> bool {
+    let pattern = pattern.trim();
+
+    // Convert glob pattern to regex-like matching
+    // Support ** for any number of directories and * for any characters
+    let pattern_regex = pattern
+        .replace("**", "DOUBLE_STAR")
+        .replace('*', "[^/]*")
+        .replace("DOUBLE_STAR", ".*");
+
+    let re = match Regex::new(&format!("^{}$", pattern_regex)) {
+        Ok(r) => r,
+        Err(_) => return false,
+    };
+
+    re.is_match(current_dir)
+}
+
+fn should_show_for_path(path_filter: &Option<String>) -> bool {
+    match path_filter {
+        None => true, // No filter means show everywhere
+        Some(filter) => {
+            let current_dir = match env::current_dir() {
+                Ok(dir) => dir.to_string_lossy().to_string(),
+                Err(_) => return false,
+            };
+
+            // Split by comma and check if any pattern matches
+            filter.split(',')
+                .map(|p| p.trim())
+                .any(|pattern| matches_path_pattern(&current_dir, pattern))
+        }
+    }
+}
+
+fn should_show_for_os(os_filter: &Option<String>) -> bool {
+    match os_filter {
+        None => true, // No filter means show on all OSes
+        Some(filter) => {
+            let current_os = get_current_os();
+
+            // Split by comma and check each OS rule
+            for os_rule in filter.split(',').map(|s| s.trim()) {
+                if os_rule.starts_with('!') {
+                    // Negation: exclude this OS
+                    let excluded_os = &os_rule[1..];
+                    if current_os == excluded_os {
+                        return false;
+                    }
+                } else {
+                    // Positive match: include this OS
+                    if current_os == os_rule {
+                        return true;
+                    }
+                }
+            }
+
+            // If we only had negations and didn't match any, show the item
+            // If we had positive matches and didn't match any, don't show
+            let has_positive = filter.split(',').any(|s| !s.trim().starts_with('!'));
+            !has_positive
+        }
+    }
+}
+
 fn gen_lists(tag_rules: &str) -> FilterOpts {
     let words: Vec<_> = tag_rules.split(',').collect();
 
@@ -223,6 +293,16 @@ impl<'a> Parser<'a> {
             }
         }
 
+        // Filter by path
+        if !should_show_for_path(&item.path_filter) {
+            return Ok(());
+        }
+
+        // Filter by OS
+        if !should_show_for_os(&item.os_filter) {
+            return Ok(());
+        }
+
         let write_fn = self.write_fn;
 
         self.writer
@@ -275,6 +355,14 @@ impl<'a> Parser<'a> {
             // raycast icon
             else if let Some(icon) = line.strip_prefix("; raycast.icon:") {
                 item.icon = Some(icon.trim().into());
+            }
+            // path filter
+            else if let Some(path) = line.strip_prefix("; path:") {
+                item.path_filter = Some(path.trim().into());
+            }
+            // os filter
+            else if let Some(os) = line.strip_prefix("; os:") {
+                item.os_filter = Some(os.trim().into());
             }
             // metacomment
             else if line.starts_with(';') {
@@ -346,5 +434,73 @@ mod tests {
         assert_eq!(opts.column, None);
         assert_eq!(opts.delimiter, None);
         assert_eq!(opts.suggestion_type, SuggestionType::SingleSelection);
+    }
+
+    #[test]
+    fn test_path_pattern_matching() {
+        // Test exact match
+        assert!(matches_path_pattern("/home/user/projects", "/home/user/projects"));
+
+        // Test single star
+        assert!(matches_path_pattern("/home/user/test", "/home/user/*"));
+        assert!(matches_path_pattern("/home/user/projects", "/home/user/*"));
+        assert!(!matches_path_pattern("/home/user/sub/dir", "/home/user/*"));
+
+        // Test double star
+        assert!(matches_path_pattern("/home/user/projects", "**/projects"));
+        assert!(matches_path_pattern("/var/lib/projects", "**/projects"));
+        assert!(matches_path_pattern("/home/user/code/projects", "**/projects"));
+        assert!(matches_path_pattern("/home/user/projects/sub", "**/projects/**"));
+        assert!(matches_path_pattern("/home/user/projects/sub/deep", "**/projects/**"));
+
+        // Test wildcard in middle
+        assert!(matches_path_pattern("/home/user/git-repo", "**/git-*"));
+        assert!(matches_path_pattern("/home/user/git-repo/src", "**/git-*/**"));
+        assert!(matches_path_pattern("/var/git-main/src", "**/git-*/**"));
+        assert!(!matches_path_pattern("/home/user/svn-repo", "**/git-*/**"));
+    }
+
+    #[test]
+    fn test_os_filtering() {
+        let current_os = get_current_os();
+
+        // No filter - should always show
+        assert!(should_show_for_os(&None));
+
+        // Positive match
+        assert!(should_show_for_os(&Some(current_os.clone())));
+
+        // Different OS - should not show
+        let other_os = if current_os == "linux" { "windows" } else { "linux" };
+        assert!(!should_show_for_os(&Some(other_os.to_string())));
+
+        // Negation - exclude current OS
+        assert!(!should_show_for_os(&Some(format!("!{}", current_os))));
+
+        // Negation - exclude different OS (should show)
+        assert!(should_show_for_os(&Some(format!("!{}", other_os))));
+
+        // Multiple values with current OS
+        assert!(should_show_for_os(&Some(format!("{}, windows, macos", current_os))));
+
+        // Multiple values without current OS
+        let filter = if current_os == "linux" {
+            "windows, macos"
+        } else {
+            "linux"
+        };
+        assert!(!should_show_for_os(&Some(filter.to_string())));
+    }
+
+    #[test]
+    fn test_path_filtering() {
+        // No filter - should always show
+        assert!(should_show_for_path(&None));
+
+        // With filter - depends on current directory
+        // We can't test the actual path matching without knowing the test runner's pwd,
+        // but we can verify the function doesn't panic
+        let _ = should_show_for_path(&Some("**/projects/**".to_string()));
+        let _ = should_show_for_path(&Some("/home/user/*, /var/**".to_string()));
     }
 }
