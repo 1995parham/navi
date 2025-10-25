@@ -5,7 +5,7 @@ This is a reference of all known methods to install navi.
 > [!CAUTION]
 > Navi, as of now, has only two official builds, the released binaries on GitHub
 > and the published package on brew.
-> 
+>
 > All the other packages are community-maintained.
 
 ## Using package managers
@@ -23,9 +23,9 @@ brew install navi
 
 > [!WARNING]
 > You need to enable the GURU overlay for the instructions below to work correctly.
-> 
+>
 > For more details see:
-> 
+>
 > - [wiki.gentoo.org/wiki/Ebuild_repository](https://wiki.gentoo.org/wiki/Ebuild_repository)
 > - [gpo.zugaina.org/Overlays/guru/app-misc/navi](https://gpo.zugaina.org/Overlays/guru/app-misc/navi).
 
@@ -72,7 +72,7 @@ choco install navi
 > [!CAUTION]
 > You currently need to create the config file `$env:USERPROFILE\AppData\Roaming\navi\config.yaml`
 > and define the `shell.command` directive as `powershell` for navi to work correctly.
-> 
+>
 > ```yaml
 > shell:
 >   command: powershell
@@ -113,28 +113,35 @@ test their modifications but can be used by end users who want to build their ow
 
 - You need to clone the repository:
 
-    ```bash
-    git clone https://github.com/denisidoro/navi && cd navi
-    ```
+  ```bash
+  git clone https://github.com/denisidoro/navi && cd navi
+  ```
 
-- Call `make`
+- Install using `just` (recommended) or `cargo`
 
-    ```bash
-    make install
-    ```
+  **Using just:**
 
-You can specify the binary directory with:
+  ```bash
+  just install
+  ```
 
-```bash
-make BIN_DIR=/usr/local/bin install
-```
+  **Using cargo directly:**
+
+  ```bash
+  cargo install --path .
+  ```
+
+> [!NOTE]
+> The project uses [just](https://github.com/casey/just) as a command runner.
+> Install it with: `cargo install just`
+> Run `just --list` to see all available commands.
 
 ## Compile time environment variables
 
 **navi** supports environment variables at compile time that will modify the behavior of navi at runtime, they are:
 
 | Environment variable | Description                                                 |
-|----------------------|-------------------------------------------------------------|
+| -------------------- | ----------------------------------------------------------- |
 | `NAVI_PATH`          | This defines the default path used by navi for cheatsheets. |
 | `NAVI_CONFIG`        | This defines the default configuration file used by navi.   |
 
