@@ -20,7 +20,7 @@ jobs:
           mkdir /tmp/cheats-dir
           touch /tmp/config-file
 
-      - name: Run cargo test (with custom paths)
+      - name: Run cargo test
         run: cargo test
         env:
           NAVI_PATH: /tmp/cheats-dir
