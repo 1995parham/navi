@@ -1,6 +1,6 @@
 [package]
 name = "navi"
-version = "2.25.0-beta1"
+version = "3.0.0"
 authors = [
   "Parham Alvani <parham.alvani@gmail.com>",
   "Denis Isidoro <denis_isidoro@live.com>",
