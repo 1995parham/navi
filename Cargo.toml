@@ -1,12 +1,16 @@
 [package]
 name = "navi"
 version = "2.25.0-beta1"
-authors = ["Denis Isidoro <denis_isidoro@live.com>", "Alexis Opolka <alexis.opolka@protonmail.com>"]
-edition = "2021"
+authors = [
+  "Parham Alvani <parham.alvani@gmail.com>",
+  "Denis Isidoro <denis_isidoro@live.com>",
+  "Alexis Opolka <alexis.opolka@protonmail.com>",
+]
+edition = "2024"
 description = "An interactive cheatsheet tool for the command-line"
-homepage = "https://github.com/denisidoro/navi"
-documentation = "https://github.com/denisidoro/navi"
-repository = "https://github.com/denisidoro/navi"
+homepage = "https://github.com/1995parham/navi"
+documentation = "https://github.com/1995parham/navi"
+repository = "https://github.com/1995parham/navi"
 keywords = ["cheatsheets", "terminal", "cli", "tui", "shell"]
 categories = ["command-line-utilities"]
 license = "Apache-2.0"
@@ -15,13 +19,10 @@ license = "Apache-2.0"
 disable-command-execution = []
 disable-repo-management = []
 
-[badges]
-travis-ci = { repository = "denisidoro/navi", branch = "master" }
-
 [dependencies]
 regex = { version = "1.7.3", default-features = false, features = [
-   "std",
-   "unicode-perl",
+  "std",
+  "unicode-perl",
 ] }
 clap = { version = "4.2.1", features = ["derive", "cargo"] }
 crossterm = "0.29.0"
