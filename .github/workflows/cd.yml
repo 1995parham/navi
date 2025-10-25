@@ -58,7 +58,7 @@ jobs:
         if: steps.check_release.outputs.RELEASE_EXISTS == 'false'
         run: |
           gh release create ${{ steps.get_version.outputs.VERSION }} \
-            --title "Release ${{ steps.get_version.outputs.VERSION }}" \
+            --title "${{ steps.get_version.outputs.VERSION }}" \
             --generate-notes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
