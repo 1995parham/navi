@@ -161,7 +161,8 @@ fn replace_variables_from_snippet(
     preview_context_env_vars: &std::collections::HashMap<String, String>,
 ) -> Result<String> {
     let mut interpolated_snippet = String::from(snippet);
-    let mut variable_cache: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+    let mut variable_cache: std::collections::HashMap<String, String> =
+        std::collections::HashMap::new();
 
     if CONFIG.prevent_interpolation() {
         return Ok(interpolated_snippet);
@@ -183,11 +184,25 @@ fn replace_variables_from_snippet(
             cached.clone()
         } else if let Some(suggestion) = variables.get_suggestion(tags, variable_name) {
             let mut new_suggestion = suggestion.clone();
-            new_suggestion.0 =
-                replace_variables_from_snippet(&new_suggestion.0, tags, variables.clone(), preview_context_env_vars)?;
-            prompt_finder(variable_name, Some(&new_suggestion), variable_count, preview_context_env_vars)?
+            new_suggestion.0 = replace_variables_from_snippet(
+                &new_suggestion.0,
+                tags,
+                variables.clone(),
+                preview_context_env_vars,
+            )?;
+            prompt_finder(
+                variable_name,
+                Some(&new_suggestion),
+                variable_count,
+                preview_context_env_vars,
+            )?
         } else {
-            prompt_finder(variable_name, None, variable_count, preview_context_env_vars)?
+            prompt_finder(
+                variable_name,
+                None,
+                variable_count,
+                preview_context_env_vars,
+            )?
         };
 
         variable_cache.insert(env_variable_name, value.clone());
@@ -232,7 +247,10 @@ pub fn act(
     }
 
     let mut preview_context_env_vars = std::collections::HashMap::new();
-    preview_context_env_vars.insert(env_var::PREVIEW_INITIAL_SNIPPET.to_string(), snippet.clone());
+    preview_context_env_vars.insert(
+        env_var::PREVIEW_INITIAL_SNIPPET.to_string(),
+        snippet.clone(),
+    );
     preview_context_env_vars.insert(env_var::PREVIEW_TAGS.to_string(), tags.clone());
     preview_context_env_vars.insert(env_var::PREVIEW_COMMENT.to_string(), comment.to_string());
 
