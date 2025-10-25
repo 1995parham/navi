@@ -11,66 +11,84 @@ on:
 
 name: CI
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  # check:
-  #   name: Check
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout sources
-  #       uses: actions/checkout@v5
-
-  #     - name: Install stable toolchain
-  #       uses: actions-rs/toolchain@v1
-  #       with:
-  #         profile: minimal
-  #         toolchain: stable
-  #         override: true
-
-  #     - name: Run cargo check
-  #       uses: actions-rs/cargo@v1
-  #       continue-on-error: false
-  #       with:
-  #         command: check
-
   test:
     name: Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout sources
         uses: actions/checkout@v5
 
       - name: Install stable toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
         with:
-          profile: minimal
-          toolchain: stable
-          override: true
+          path: ~/.cargo/registry/index
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-index-
+
+      - name: Cache cargo registry cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry/cache
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+
+      - name: Cache cargo git
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-git-
+
+      - name: Cache cargo build
+        uses: actions/cache@v4
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-build-
 
       - name: Prep environment to test compiled-in paths
         run: |
           mkdir /tmp/cheats-dir
           touch /tmp/config-file
 
-      - name: Run cargo test
-        uses: actions-rs/cargo@v1
-        continue-on-error: false
+      - name: Run cargo test (with custom paths)
+        run: cargo test
         env:
           NAVI_PATH: /tmp/cheats-dir
           NAVI_CONFIG: /tmp/config-file
-        with:
-          command: test
 
-      - name: Run cargo test
-        uses: actions-rs/cargo@v1
-        continue-on-error: false
-        with:
-          command: test
+      - name: Run cargo test (default paths)
+        run: cargo test
 
       - name: Install deps
         run: ./scripts/dot pkg add git bash npm tmux
 
+      - name: Cache fzf
+        id: cache-fzf
+        uses: actions/cache@v4
+        with:
+          path: ~/.fzf
+          key: ${{ runner.os }}-fzf-${{ hashFiles('.github/workflows/ci.yml') }}
+
       - name: Install fzf
+        if: steps.cache-fzf.outputs.cache-hit != 'true'
         run: git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf; yes | ~/.fzf/install;
+
+      - name: Add fzf to PATH
+        run: echo "$HOME/.fzf/bin" >> $GITHUB_PATH
 
       - name: Install tealdeer
         run: sudo npm install -g tldr
@@ -81,28 +99,50 @@ jobs:
   lints:
     name: Lints
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout sources
         uses: actions/checkout@v5
 
-      # - name: Install stable toolchain
-      #   uses: actions-rs/toolchain@v1
-      #   with:
-      #     profile: minimal
-      #     toolchain: stable
-      #     override: true
-      #     components: rustfmt, clippy
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry/index
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-index-
+
+      - name: Cache cargo registry cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry/cache
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+
+      - name: Cache cargo git
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-git-
+
+      - name: Cache cargo build
+        uses: actions/cache@v4
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-clippy-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-clippy-
 
       - name: Run cargo fmt
-        uses: actions-rs/cargo@v1
-        continue-on-error: false
-        with:
-          command: fmt
-          args: --all -- --check
+        run: cargo fmt --all -- --check
 
       - name: Run cargo clippy
-        uses: actions-rs/cargo@v1
-        continue-on-error: false
-        with:
-          command: clippy
-          args: -- -D warnings
+        run: cargo clippy --all-targets --all-features -- -D warnings
