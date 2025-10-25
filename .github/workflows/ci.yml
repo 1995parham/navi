@@ -1,13 +1,5 @@
-# Based on https://github.com/actions-rs/meta/blob/master/recipes/quickstart.md
-#
-# While our "example" application has the platform-specific code,
-# for simplicity we are compiling and testing everything on the Ubuntu environment only.
-# For multi-OS testing see the `cross.yml` workflow.
-
 on:
   push:
-  pull_request:
-    branches: [master]
 
 name: CI
 
@@ -19,45 +11,9 @@ jobs:
   test:
     name: Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
       - name: Checkout sources
         uses: actions/checkout@v5
-
-      - name: Install stable toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache cargo registry
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo/registry/index
-          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-index-
-
-      - name: Cache cargo registry cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo/registry/cache
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-registry-
-
-      - name: Cache cargo git
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo/git
-          key: ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-git-
-
-      - name: Cache cargo build
-        uses: actions/cache@v4
-        with:
-          path: target
-          key: ${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-build-
 
       - name: Prep environment to test compiled-in paths
         run: |
@@ -76,19 +32,11 @@ jobs:
       - name: Install deps
         run: ./scripts/dot pkg add git bash npm tmux
 
-      - name: Cache fzf
-        id: cache-fzf
-        uses: actions/cache@v4
-        with:
-          path: ~/.fzf
-          key: ${{ runner.os }}-fzf-${{ hashFiles('.github/workflows/ci.yml') }}
-
       - name: Install fzf
-        if: steps.cache-fzf.outputs.cache-hit != 'true'
         run: git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf; yes | ~/.fzf/install;
 
       - name: Add fzf to PATH
-        run: echo "$HOME/.fzf/bin" >> $GITHUB_PATH
+        run: echo "$HOME/.fzf/bin" >> "$GITHUB_PATH"
 
       - name: Install tealdeer
         run: sudo npm install -g tldr
@@ -99,47 +47,9 @@ jobs:
   lints:
     name: Lints
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     steps:
       - name: Checkout sources
         uses: actions/checkout@v5
-
-      - name: Install stable toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
-
-      - name: Cache cargo registry
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo/registry/index
-          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-index-
-
-      - name: Cache cargo registry cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo/registry/cache
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-registry-
-
-      - name: Cache cargo git
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo/git
-          key: ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-git-
-
-      - name: Cache cargo build
-        uses: actions/cache@v4
-        with:
-          path: target
-          key: ${{ runner.os }}-cargo-clippy-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-clippy-
 
       - name: Run cargo fmt
         run: cargo fmt --all -- --check
