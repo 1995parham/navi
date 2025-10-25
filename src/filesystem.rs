@@ -58,10 +58,10 @@ pub fn default_cheat_pathbuf() -> Result<PathBuf> {
     pathbuf.push("navi");
     pathbuf.push("cheats");
 
-    if pathbuf.exists() {
-        if let Some(path) = compiled_default_path(option_env!("NAVI_PATH")) {
-            pathbuf = path;
-        }
+    if pathbuf.exists()
+        && let Some(path) = compiled_default_path(option_env!("NAVI_PATH"))
+    {
+        pathbuf = path;
     }
     Ok(pathbuf)
 }
@@ -72,10 +72,10 @@ pub fn default_config_pathbuf() -> Result<PathBuf> {
     pathbuf.push("navi");
     pathbuf.push("config.yaml");
 
-    if !pathbuf.exists() {
-        if let Some(path) = compiled_default_path(option_env!("NAVI_CONFIG")) {
-            pathbuf = path;
-        }
+    if !pathbuf.exists()
+        && let Some(path) = compiled_default_path(option_env!("NAVI_CONFIG"))
+    {
+        pathbuf = path;
     }
     Ok(pathbuf)
 }

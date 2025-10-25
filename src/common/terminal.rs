@@ -45,11 +45,13 @@ pub fn width() -> u16 {
     }
 }
 
+#[allow(dead_code)]
 pub fn parse_ansi(ansi: &str) -> Option<style::Color> {
     style::Color::parse_ansi(&format!("5;{ansi}"))
 }
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct Color(#[allow(unused)] pub style::Color); // suppress warning: field `0` is never read.
 
 impl FromStr for Color {

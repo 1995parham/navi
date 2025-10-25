@@ -1,5 +1,6 @@
 use crate::filesystem;
 use crate::prelude::*;
+use std::collections::HashMap;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Opts {
@@ -17,6 +18,7 @@ pub struct Opts {
     pub map: Option<String>,
     pub prevent_select1: bool,
     pub show_all_columns: bool,
+    pub env_vars: HashMap<String, String>,
 }
 
 impl Default for Opts {
@@ -36,6 +38,7 @@ impl Default for Opts {
             map: None,
             prevent_select1: true,
             show_all_columns: false,
+            env_vars: HashMap::new(),
         }
     }
 }

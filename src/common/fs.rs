@@ -27,6 +27,7 @@ pub struct InvalidPath(pub PathBuf);
 
 #[derive(Error, Debug)]
 #[error("Unable to read directory `{dir}`")]
+#[allow(dead_code)]
 pub struct UnreadableDir {
     dir: PathBuf,
     #[source]

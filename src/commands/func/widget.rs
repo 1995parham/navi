@@ -23,10 +23,10 @@ pub fn last_command() -> Result<()> {
 
     for (pattern, _) in replacements.clone() {
         let mut new_parts = text.rsplit(pattern);
-        if let Some(extracted_attempt) = new_parts.next() {
-            if extracted_attempt.len() <= extracted.len() {
-                extracted = extracted_attempt.to_string();
-            }
+        if let Some(extracted_attempt) = new_parts.next()
+            && extracted_attempt.len() <= extracted.len()
+        {
+            extracted = extracted_attempt.to_string();
         }
     }
 

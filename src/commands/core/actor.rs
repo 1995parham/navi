@@ -16,11 +16,9 @@ fn prompt_finder(
     variable_name: &str,
     suggestion: Option<&Suggestion>,
     variable_count: usize,
+    preview_context_env_vars: &std::collections::HashMap<String, String>,
 ) -> Result<String> {
-    env_var::remove(env_var::PREVIEW_COLUMN);
-    env_var::remove(env_var::PREVIEW_DELIMITER);
-    env_var::remove(env_var::PREVIEW_MAP);
-
+    let mut preview_env_vars = preview_context_env_vars.clone();
     let mut extra_preview: Option<String> = None;
 
     let (suggestions, initial_opts) = if let Some(s) = suggestion {
@@ -28,13 +26,13 @@ fn prompt_finder(
 
         if let Some(sopts) = suggestion_opts {
             if let Some(c) = &sopts.column {
-                env_var::set(env_var::PREVIEW_COLUMN, c.to_string());
+                preview_env_vars.insert(env_var::PREVIEW_COLUMN.to_string(), c.to_string());
             }
             if let Some(d) = &sopts.delimiter {
-                env_var::set(env_var::PREVIEW_DELIMITER, d);
+                preview_env_vars.insert(env_var::PREVIEW_DELIMITER.to_string(), d.to_string());
             }
             if let Some(m) = &sopts.map {
-                env_var::set(env_var::PREVIEW_MAP, m);
+                preview_env_vars.insert(env_var::PREVIEW_MAP.to_string(), m.to_string());
             }
             if let Some(p) = &sopts.preview {
                 extra_preview = Some(p.into());
@@ -113,6 +111,7 @@ fn prompt_finder(
     let mut opts = FinderOpts {
         preview: Some(preview),
         show_all_columns: true,
+        env_vars: preview_env_vars,
         ..initial_opts.clone().unwrap_or_else(FinderOpts::var_default)
     };
 
@@ -159,8 +158,10 @@ fn replace_variables_from_snippet(
     snippet: &str,
     tags: &str,
     variables: VariableMap,
+    preview_context_env_vars: &std::collections::HashMap<String, String>,
 ) -> Result<String> {
     let mut interpolated_snippet = String::from(snippet);
+    let mut variable_cache: std::collections::HashMap<String, String> = std::collections::HashMap::new();
 
     if CONFIG.prevent_interpolation() {
         return Ok(interpolated_snippet);
@@ -176,20 +177,20 @@ fn replace_variables_from_snippet(
         let variable_name = &bracketed_variable_name[1..bracketed_variable_name.len() - 1];
 
         let env_variable_name = env_var::escape(variable_name);
-        let env_value = env_var::get(&env_variable_name);
+        let cached_value = variable_cache.get(&env_variable_name);
 
-        let value = if let Ok(e) = env_value {
-            e
+        let value = if let Some(cached) = cached_value {
+            cached.clone()
         } else if let Some(suggestion) = variables.get_suggestion(tags, variable_name) {
             let mut new_suggestion = suggestion.clone();
             new_suggestion.0 =
-                replace_variables_from_snippet(&new_suggestion.0, tags, variables.clone())?;
-            prompt_finder(variable_name, Some(&new_suggestion), variable_count)?
+                replace_variables_from_snippet(&new_suggestion.0, tags, variables.clone(), preview_context_env_vars)?;
+            prompt_finder(variable_name, Some(&new_suggestion), variable_count, preview_context_env_vars)?
         } else {
-            prompt_finder(variable_name, None, variable_count)?
+            prompt_finder(variable_name, None, variable_count, preview_context_env_vars)?
         };
 
-        env_var::set(env_variable_name, &value);
+        variable_cache.insert(env_variable_name, value.clone());
 
         interpolated_snippet = if value.as_str() == "\n" {
             interpolated_snippet.replacen(bracketed_variable_name, "", 1)
@@ -230,15 +231,17 @@ pub fn act(
         return Ok(());
     }
 
-    env_var::set(env_var::PREVIEW_INITIAL_SNIPPET, &snippet);
-    env_var::set(env_var::PREVIEW_TAGS, &tags);
-    env_var::set(env_var::PREVIEW_COMMENT, comment);
+    let mut preview_context_env_vars = std::collections::HashMap::new();
+    preview_context_env_vars.insert(env_var::PREVIEW_INITIAL_SNIPPET.to_string(), snippet.clone());
+    preview_context_env_vars.insert(env_var::PREVIEW_TAGS.to_string(), tags.clone());
+    preview_context_env_vars.insert(env_var::PREVIEW_COMMENT.to_string(), comment.to_string());
 
     let interpolated_snippet = {
         let mut s = replace_variables_from_snippet(
             &snippet,
             &tags,
             variables.expect("No variables received from finder"),
+            &preview_context_env_vars,
         )
         .context("Failed to replace variables from snippet")?;
         s = with_absolute_path(s);

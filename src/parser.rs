@@ -191,9 +191,8 @@ fn should_show_for_os(os_filter: &Option<String>) -> bool {
 
             // Split by comma and check each OS rule
             for os_rule in filter.split(',').map(|s| s.trim()) {
-                if os_rule.starts_with('!') {
+                if let Some(excluded_os) = os_rule.strip_prefix('!') {
                     // Negation: exclude this OS
-                    let excluded_os = &os_rule[1..];
                     if current_os == excluded_os {
                         return false;
                     }
@@ -293,10 +292,10 @@ impl<'a> Parser<'a> {
             }
         }
 
-        if let Some(h) = self.filter.hash {
-            if h != hash {
-                return Ok(());
-            }
+        if let Some(h) = self.filter.hash
+            && h != hash
+        {
+            return Ok(());
         }
 
         // Filter by path

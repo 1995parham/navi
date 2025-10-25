@@ -74,21 +74,19 @@ impl FinderChoice {
             Self::Skim => "sk",
         };
 
-        if let Self::Fzf = self {
-            if let Some((major, minor, patch)) = Self::check_fzf_version() {
-                if major == MIN_FZF_VERSION_MAJOR
-                    && minor < MIN_FZF_VERSION_MINOR
-                    && patch < MIN_FZF_VERSION_PATCH
-                {
-                    eprintln!(
-                        "Warning: Fzf version {major}.{minor} does not support the preview window layout used by navi.",
-                    );
-                    eprintln!(
-                        "Consider updating Fzf to a version >= {MIN_FZF_VERSION_MAJOR}.{MIN_FZF_VERSION_MINOR}.{MIN_FZF_VERSION_PATCH} or use a compatible layout.",
-                    );
-                    process::exit(1);
-                }
-            }
+        if let Self::Fzf = self
+            && let Some((major, minor, patch)) = Self::check_fzf_version()
+            && major == MIN_FZF_VERSION_MAJOR
+            && minor < MIN_FZF_VERSION_MINOR
+            && patch < MIN_FZF_VERSION_PATCH
+        {
+            eprintln!(
+                "Warning: Fzf version {major}.{minor} does not support the preview window layout used by navi.",
+            );
+            eprintln!(
+                "Consider updating Fzf to a version >= {MIN_FZF_VERSION_MAJOR}.{MIN_FZF_VERSION_MINOR}.{MIN_FZF_VERSION_PATCH} or use a compatible layout.",
+            );
+            process::exit(1);
         }
 
         let mut command = Command::new(finder_str);
@@ -122,10 +120,10 @@ impl FinderChoice {
             command.args(["--with-nth", "1,2,3"]);
         }
 
-        if !opts.prevent_select1 {
-            if let Self::Fzf = self {
-                command.arg("--select-1");
-            }
+        if !opts.prevent_select1
+            && let Self::Fzf = self
+        {
+            command.arg("--select-1");
         }
 
         match opts.suggestion_type {
@@ -189,6 +187,7 @@ impl FinderChoice {
 
         command
             .env("SHELL", CONFIG.finder_shell())
+            .envs(&opts.env_vars)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped());
         debug!(cmd = ?command);
