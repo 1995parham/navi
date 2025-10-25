@@ -1,7 +1,7 @@
 use super::*;
 use crate::common::terminal;
 use crate::structures::item::Item;
-use crossterm::style::{style, Stylize};
+use crossterm::style::{Stylize, style};
 use std::cmp::max;
 
 pub fn get_widths() -> (usize, usize, usize) {
@@ -34,16 +34,21 @@ lazy_static! {
 pub fn write(item: &Item) -> String {
     let (tag_width_percentage, comment_width_percentage, snippet_width_percentage) = *COLUMN_WIDTHS;
     format!(
-            "{tags_short}{delimiter}{comment_short}{delimiter}{snippet_short}{delimiter}{tags}{delimiter}{comment}{delimiter}{snippet}{delimiter}{file_index}{delimiter}\n",
-            tags_short = style(limit_str(&item.tags, tag_width_percentage)).with(CONFIG.tag_color()),
-            comment_short = style(limit_str(&item.comment, comment_width_percentage)).with(CONFIG.comment_color()),
-            snippet_short = style(limit_str(&fix_newlines(&item.snippet), snippet_width_percentage)).with(CONFIG.snippet_color()),
-            tags = item.tags,
-            comment = item.comment,
-            delimiter = DELIMITER,
-            snippet = &item.snippet.trim_end_matches(LINE_SEPARATOR),
-            file_index = item.file_index.unwrap_or(0),
-        )
+        "{tags_short}{delimiter}{comment_short}{delimiter}{snippet_short}{delimiter}{tags}{delimiter}{comment}{delimiter}{snippet}{delimiter}{file_index}{delimiter}\n",
+        tags_short = style(limit_str(&item.tags, tag_width_percentage)).with(CONFIG.tag_color()),
+        comment_short =
+            style(limit_str(&item.comment, comment_width_percentage)).with(CONFIG.comment_color()),
+        snippet_short = style(limit_str(
+            &fix_newlines(&item.snippet),
+            snippet_width_percentage
+        ))
+        .with(CONFIG.snippet_color()),
+        tags = item.tags,
+        comment = item.comment,
+        delimiter = DELIMITER,
+        snippet = &item.snippet.trim_end_matches(LINE_SEPARATOR),
+        file_index = item.file_index.unwrap_or(0),
+    )
 }
 
 pub fn read(raw_snippet: &str, is_single: bool) -> Result<(&str, Item)> {

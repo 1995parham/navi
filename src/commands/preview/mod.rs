@@ -1,7 +1,7 @@
 use crate::deser;
 use crate::prelude::*;
 use clap::Args;
-use crossterm::style::{style, Stylize};
+use crossterm::style::{Stylize, style};
 use std::process;
 
 pub mod var;

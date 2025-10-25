@@ -8,7 +8,8 @@ use std::env;
 use std::io::Write;
 
 lazy_static! {
-    pub static ref VAR_LINE_REGEX: Regex = Regex::new(r"^\$\s*([^:]+):(.*)").expect("Invalid regex");
+    pub static ref VAR_LINE_REGEX: Regex =
+        Regex::new(r"^\$\s*([^:]+):(.*)").expect("Invalid regex");
 }
 
 fn parse_opts(text: &str) -> Result<FinderOpts> {
@@ -17,7 +18,8 @@ fn parse_opts(text: &str) -> Result<FinderOpts> {
 
     let mut opts = FinderOpts::var_default();
 
-    let parts = shellwords::split(text).map_err(|_| anyhow!("Given options are missing a closing quote"))?;
+    let parts = shellwords::split(text)
+        .map_err(|_| anyhow!("Given options are missing a closing quote"))?;
 
     parts
         .into_iter()
@@ -86,9 +88,12 @@ fn parse_opts(text: &str) -> Result<FinderOpts> {
 }
 
 fn parse_variable_line(line: &str) -> Result<(&str, &str, Option<FinderOpts>)> {
-    let caps = VAR_LINE_REGEX
-        .captures(line)
-        .ok_or_else(|| anyhow!("No variables, command, and options found in the line `{}`", line))?;
+    let caps = VAR_LINE_REGEX.captures(line).ok_or_else(|| {
+        anyhow!(
+            "No variables, command, and options found in the line `{}`",
+            line
+        )
+    })?;
     let variable = caps
         .get(1)
         .ok_or_else(|| anyhow!("No variable captured in the line `{}`", line))?
@@ -326,8 +331,9 @@ impl<'a> Parser<'a> {
         let mut inside_snippet: bool = false;
 
         for (line_nr, line_result) in lines.enumerate() {
-            let line = line_result
-                .with_context(|| format!("Failed to read line number {line_nr} in cheatsheet `{id}`"))?;
+            let line = line_result.with_context(|| {
+                format!("Failed to read line number {line_nr} in cheatsheet `{id}`")
+            })?;
 
             if should_break {
                 break;
@@ -351,7 +357,8 @@ impl<'a> Parser<'a> {
             // dependency
             else if line.starts_with('@') {
                 let tags_dependency = without_prefix(&line);
-                self.variables.insert_dependency(&item.tags, &tags_dependency);
+                self.variables
+                    .insert_dependency(&item.tags, &tags_dependency);
             }
             // raycast icon
             else if let Some(icon) = line.strip_prefix("; raycast.icon:") {
@@ -395,8 +402,11 @@ impl<'a> Parser<'a> {
                             )
                         })?;
                     variable_cmd = String::from("");
-                    self.variables
-                        .insert_suggestion(&item.tags, variable, (String::from(command), opts));
+                    self.variables.insert_suggestion(
+                        &item.tags,
+                        variable,
+                        (String::from(command), opts),
+                    );
                 }
             }
             // markdown snippet
@@ -427,7 +437,8 @@ mod tests {
     #[test]
     fn test_parse_variable_line() {
         let (variable, command, command_options) =
-            parse_variable_line("$ user : echo -e \"$(whoami)\\nroot\" --- --prevent-extra").unwrap();
+            parse_variable_line("$ user : echo -e \"$(whoami)\\nroot\" --- --prevent-extra")
+                .unwrap();
         assert_eq!(command, " echo -e \"$(whoami)\\nroot\" ");
         assert_eq!(variable, "user");
         let opts = command_options.unwrap();
@@ -440,7 +451,10 @@ mod tests {
     #[test]
     fn test_path_pattern_matching() {
         // Test exact match
-        assert!(matches_path_pattern("/home/user/projects", "/home/user/projects"));
+        assert!(matches_path_pattern(
+            "/home/user/projects",
+            "/home/user/projects"
+        ));
 
         // Test single star
         assert!(matches_path_pattern("/home/user/test", "/home/user/*"));
@@ -450,8 +464,14 @@ mod tests {
         // Test double star
         assert!(matches_path_pattern("/home/user/projects", "**/projects"));
         assert!(matches_path_pattern("/var/lib/projects", "**/projects"));
-        assert!(matches_path_pattern("/home/user/code/projects", "**/projects"));
-        assert!(matches_path_pattern("/home/user/projects/sub", "**/projects/**"));
+        assert!(matches_path_pattern(
+            "/home/user/code/projects",
+            "**/projects"
+        ));
+        assert!(matches_path_pattern(
+            "/home/user/projects/sub",
+            "**/projects/**"
+        ));
         assert!(matches_path_pattern(
             "/home/user/projects/sub/deep",
             "**/projects/**"
@@ -459,7 +479,10 @@ mod tests {
 
         // Test wildcard in middle
         assert!(matches_path_pattern("/home/user/git-repo", "**/git-*"));
-        assert!(matches_path_pattern("/home/user/git-repo/src", "**/git-*/**"));
+        assert!(matches_path_pattern(
+            "/home/user/git-repo/src",
+            "**/git-*/**"
+        ));
         assert!(matches_path_pattern("/var/git-main/src", "**/git-*/**"));
         assert!(!matches_path_pattern("/home/user/svn-repo", "**/git-*/**"));
     }
@@ -475,7 +498,11 @@ mod tests {
         assert!(should_show_for_os(&Some(current_os.clone())));
 
         // Different OS - should not show
-        let other_os = if current_os == "linux" { "windows" } else { "linux" };
+        let other_os = if current_os == "linux" {
+            "windows"
+        } else {
+            "linux"
+        };
         assert!(!should_show_for_os(&Some(other_os.to_string())));
 
         // Negation - exclude current OS

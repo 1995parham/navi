@@ -33,7 +33,9 @@ Make sure wget is correctly installed.";
         }
     };
 
-    let out = child.wait_with_output().context("Failed to wait for wget")?;
+    let out = child
+        .wait_with_output()
+        .context("Failed to wait for wget")?;
 
     if let Some(0) = out.status.code() {
         let stdout = out.stdout;
@@ -65,8 +67,10 @@ Error:
 {}
 ",
             args.join(" "),
-            String::from_utf8(out.stdout).unwrap_or_else(|_e| "Unable to get output message".to_string()),
-            String::from_utf8(out.stderr).unwrap_or_else(|_e| "Unable to get error message".to_string())
+            String::from_utf8(out.stdout)
+                .unwrap_or_else(|_e| "Unable to get output message".to_string()),
+            String::from_utf8(out.stderr)
+                .unwrap_or_else(|_e| "Unable to get error message".to_string())
         );
         Err(anyhow!(msg))
     }

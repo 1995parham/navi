@@ -1,7 +1,7 @@
 use crate::commands;
 use crate::finder::FinderChoice;
 
-use clap::{crate_version, Parser, Subcommand};
+use clap::{Parser, Subcommand, crate_version};
 
 #[derive(Debug, Parser)]
 #[command(after_help = "\x1b[0;33mMORE INFO:\x1b[0;0m

@@ -276,7 +276,8 @@ mod tests {
 
     #[test]
     fn test_default_config_pathbuf() {
-        let base_dirs = etcetera::choose_base_strategy().expect("could not determine base directories");
+        let base_dirs =
+            etcetera::choose_base_strategy().expect("could not determine base directories");
 
         let expected = {
             let mut e = base_dirs.config_dir();
@@ -292,7 +293,8 @@ mod tests {
 
     #[test]
     fn test_default_cheat_pathbuf() {
-        let base_dirs = etcetera::choose_base_strategy().expect("could not determine base directories");
+        let base_dirs =
+            etcetera::choose_base_strategy().expect("could not determine base directories");
 
         let expected = {
             let mut e = base_dirs.data_dir();

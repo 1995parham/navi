@@ -1,7 +1,7 @@
 use clap::Args;
 
 use super::var;
-use crate::common::shell::{self, ShellSpawnError, EOF};
+use crate::common::shell::{self, EOF, ShellSpawnError};
 use crate::prelude::*;
 use std::io::{self, Read};
 
@@ -16,7 +16,11 @@ impl Runnable for Input {
         let mut parts = text.split(EOF);
         let selection = parts.next().expect("Unable to get selection").to_owned();
         let query = parts.next().expect("Unable to get query").to_owned();
-        let variable = parts.next().expect("Unable to get variable").trim().to_owned();
+        let variable = parts
+            .next()
+            .expect("Unable to get variable")
+            .trim()
+            .to_owned();
 
         let input = var::Input {
             selection,
@@ -33,7 +37,9 @@ impl Runnable for Input {
                 let mut cmd = shell::out();
                 cmd.arg(extra);
                 debug!(?cmd);
-                cmd.spawn().map_err(|e| ShellSpawnError::new(extra, e))?.wait()?;
+                cmd.spawn()
+                    .map_err(|e| ShellSpawnError::new(extra, e))?
+                    .wait()?;
             }
         }
 

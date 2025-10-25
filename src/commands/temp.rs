@@ -25,7 +25,9 @@ pub fn main() -> Result<()> {
     let item = deser::raycast::read(&item_str)?;
     dbg!(&item);
 
-    let x = variables.get_suggestion(&item.tags, "local_branch").expect("foo");
+    let x = variables
+        .get_suggestion(&item.tags, "local_branch")
+        .expect("foo");
     dbg!(&x);
 
     let suggestion_command = x.0.clone();

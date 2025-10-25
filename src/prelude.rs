@@ -2,7 +2,7 @@ pub use crate::common::deps::HasDeps;
 pub use crate::common::fs::ToStringExt;
 pub use crate::config::CONFIG; // TODO
 pub use crate::libs::dns_common;
-pub use anyhow::{anyhow, Context, Error, Result};
+pub use anyhow::{Context, Error, Result, anyhow};
 pub use regex::Regex;
 pub use serde::de::Deserializer;
 pub use serde::ser::Serializer;

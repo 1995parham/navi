@@ -69,14 +69,19 @@ pub fn process(
     apply_map(get_column(text, column, delimiter), map_fn)
 }
 
-pub(super) fn parse_output_single(mut text: String, suggestion_type: SuggestionType) -> Result<String> {
+pub(super) fn parse_output_single(
+    mut text: String,
+    suggestion_type: SuggestionType,
+) -> Result<String> {
     Ok(match suggestion_type {
         SuggestionType::SingleSelection => text
             .lines()
             .next()
             .context("No sufficient data for single selection")?
             .to_string(),
-        SuggestionType::MultipleSelections | SuggestionType::Disabled | SuggestionType::SnippetSelection => {
+        SuggestionType::MultipleSelections
+        | SuggestionType::Disabled
+        | SuggestionType::SnippetSelection => {
             let len = text.len();
             if len > 1 {
                 text.truncate(len - 1);
@@ -96,7 +101,9 @@ pub(super) fn parse_output_single(mut text: String, suggestion_type: SuggestionT
                         (*two).to_string()
                     }
                 }
-                (Some(one), Some(termination), None) if *termination == "enter" || termination.is_empty() => {
+                (Some(one), Some(termination), None)
+                    if *termination == "enter" || termination.is_empty() =>
+                {
                     (*one).to_string()
                 }
                 (Some(one), Some(termination), _) if *termination == "tab" => (*one).to_string(),
@@ -156,6 +163,9 @@ mod tests {
     fn test_parse_snippet_request() {
         let text = "enter\nssh                     ⠀login to a server and forward to ssh key (d…  ⠀ssh -A <user>@<server>  ⠀ssh  ⠀login to a server and forward to ssh key (dangerous but useful for bastion hosts)  ⠀ssh -A <user>@<server>  ⠀\n".to_string();
         let output = parse_output_single(text, SuggestionType::SnippetSelection).unwrap();
-        assert_eq!(output,     "enter\nssh                     ⠀login to a server and forward to ssh key (d…  ⠀ssh -A <user>@<server>  ⠀ssh  ⠀login to a server and forward to ssh key (dangerous but useful for bastion hosts)  ⠀ssh -A <user>@<server>  ⠀");
+        assert_eq!(
+            output,
+            "enter\nssh                     ⠀login to a server and forward to ssh key (d…  ⠀ssh -A <user>@<server>  ⠀ssh  ⠀login to a server and forward to ssh key (dangerous but useful for bastion hosts)  ⠀ssh -A <user>@<server>  ⠀"
+        );
     }
 }

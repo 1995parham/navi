@@ -155,14 +155,21 @@ fn unique_result_count(results: &[&str]) -> usize {
     vars.len()
 }
 
-fn replace_variables_from_snippet(snippet: &str, tags: &str, variables: VariableMap) -> Result<String> {
+fn replace_variables_from_snippet(
+    snippet: &str,
+    tags: &str,
+    variables: VariableMap,
+) -> Result<String> {
     let mut interpolated_snippet = String::from(snippet);
 
     if CONFIG.prevent_interpolation() {
         return Ok(interpolated_snippet);
     }
 
-    let variables_found: Vec<&str> = deser::VAR_REGEX.find_iter(snippet).map(|m| m.as_str()).collect();
+    let variables_found: Vec<&str> = deser::VAR_REGEX
+        .find_iter(snippet)
+        .map(|m| m.as_str())
+        .collect();
     let variable_count = unique_result_count(&variables_found);
 
     for bracketed_variable_name in variables_found {
@@ -175,7 +182,8 @@ fn replace_variables_from_snippet(snippet: &str, tags: &str, variables: Variable
             e
         } else if let Some(suggestion) = variables.get_suggestion(tags, variable_name) {
             let mut new_suggestion = suggestion.clone();
-            new_suggestion.0 = replace_variables_from_snippet(&new_suggestion.0, tags, variables.clone())?;
+            new_suggestion.0 =
+                replace_variables_from_snippet(&new_suggestion.0, tags, variables.clone())?;
             prompt_finder(variable_name, Some(&new_suggestion), variable_count)?
         } else {
             prompt_finder(variable_name, None, variable_count)?

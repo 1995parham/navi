@@ -1,7 +1,7 @@
 use crate::common::git;
 use crate::filesystem;
-use crate::finder::structures::{Opts as FinderOpts, SuggestionType};
 use crate::finder::FinderChoice;
+use crate::finder::structures::{Opts as FinderOpts, SuggestionType};
 use crate::prelude::*;
 use std::fs;
 use std::path;
@@ -88,8 +88,13 @@ pub fn main(uri: String) -> Result<()> {
             p
         };
         fs::create_dir_all(&to_folder).unwrap_or(());
-        fs::copy(&from, &to)
-            .with_context(|| format!("Failed to copy `{}` to `{}`", &from.to_string(), &to.to_string()))?;
+        fs::copy(&from, &to).with_context(|| {
+            format!(
+                "Failed to copy `{}` to `{}`",
+                &from.to_string(),
+                &to.to_string()
+            )
+        })?;
     }
 
     filesystem::remove_dir(&tmp_pathbuf)?;

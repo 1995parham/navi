@@ -45,7 +45,8 @@ fn init_logger() -> anyhow::Result<()> {
         return Ok(());
     }
 
-    let writer = std::fs::File::create(&file).with_context(|| format!("{file:?} is not created"))?;
+    let writer =
+        std::fs::File::create(&file).with_context(|| format!("{file:?} is not created"))?;
     tracing::subscriber::set_global_default(
         tracing_subscriber::fmt()
             .with_ansi(false)

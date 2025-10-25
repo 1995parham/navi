@@ -1,4 +1,4 @@
-use crate::common::shell::{self, ShellSpawnError, EOF};
+use crate::common::shell::{self, EOF, ShellSpawnError};
 use crate::prelude::*;
 
 pub fn copy(text: String) -> Result<()> {

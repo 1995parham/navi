@@ -35,7 +35,10 @@ impl Runnable for Input {
         match info {
             // Here should be the example commands
             Info::CheatsExample => {
-                println!("{}", include_str!("../../docs/examples/cheatsheet/example.cheat"))
+                println!(
+                    "{}",
+                    include_str!("../../docs/examples/cheatsheet/example.cheat")
+                )
             }
             Info::ConfigExample => println!(
                 "{}",
@@ -47,8 +50,12 @@ impl Runnable for Input {
             Info::ConfigPath => println!("{}", &filesystem::default_config_pathbuf()?.to_string()),
 
             // Here should be the default values (computed at compile time)
-            Info::DefaultCheatsPath => println!("{}", &filesystem::default_cheat_pathbuf()?.to_string()),
-            Info::DefaultConfigPath => println!("{}", &filesystem::default_config_pathbuf()?.to_string()),
+            Info::DefaultCheatsPath => {
+                println!("{}", &filesystem::default_cheat_pathbuf()?.to_string())
+            }
+            Info::DefaultConfigPath => {
+                println!("{}", &filesystem::default_config_pathbuf()?.to_string())
+            }
         }
         Ok(())
     }

@@ -7,7 +7,8 @@ pub fn last_command() -> Result<()> {
 
     let replacements = vec![("||", "ග"), ("|", "ඛ"), ("&&", "ඝ")];
 
-    let parts = shellwords::split(&text).unwrap_or_else(|_| text.split('|').map(|s| s.to_string()).collect());
+    let parts = shellwords::split(&text)
+        .unwrap_or_else(|_| text.split('|').map(|s| s.to_string()).collect());
 
     for p in parts {
         for (pattern, escaped) in replacements.clone() {

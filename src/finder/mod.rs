@@ -222,7 +222,9 @@ impl FinderChoice {
 
         let return_value = stdin_fn(&mut writer).context("Failed to pass data to finder")?;
 
-        let out = child.wait_with_output().context("Failed to wait for finder")?;
+        let out = child
+            .wait_with_output()
+            .context("Failed to wait for finder")?;
 
         let output = parse(out, finder_opts).context("Unable to get output")?;
         Ok((output, return_value))

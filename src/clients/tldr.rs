@@ -79,7 +79,9 @@ Note:
         }
     };
 
-    let out = child.wait_with_output().context("Failed to wait for tldr")?;
+    let out = child
+        .wait_with_output()
+        .context("Failed to wait for tldr")?;
 
     if let Some(0) = out.status.code() {
         let stdout = out.stdout;
@@ -105,8 +107,10 @@ If you are already using a supported version you can ignore this message.
 {}
 ",
             args.join(" "),
-            String::from_utf8(out.stdout).unwrap_or_else(|_e| "Unable to get output message".to_string()),
-            String::from_utf8(out.stderr).unwrap_or_else(|_e| "Unable to get error message".to_string()),
+            String::from_utf8(out.stdout)
+                .unwrap_or_else(|_e| "Unable to get output message".to_string()),
+            String::from_utf8(out.stderr)
+                .unwrap_or_else(|_e| "Unable to get error message".to_string()),
             VERSION_DISCLAIMER,
         );
         Err(anyhow!(msg))

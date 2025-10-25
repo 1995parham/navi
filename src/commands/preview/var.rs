@@ -3,8 +3,8 @@ use crate::env_var;
 use crate::finder;
 use crate::prelude::*;
 use clap::Args;
-use crossterm::style::style;
 use crossterm::style::Stylize;
+use crossterm::style::style;
 use std::iter;
 use std::process;
 
@@ -49,7 +49,10 @@ impl Runnable for Input {
 
         let bracketed_variables: Vec<&str> = {
             if snippet.contains(&bracketed_current_variable) {
-                deser::VAR_REGEX.find_iter(&snippet).map(|m| m.as_str()).collect()
+                deser::VAR_REGEX
+                    .find_iter(&snippet)
+                    .map(|m| m.as_str())
+                    .collect()
             } else {
                 iter::once(&bracketed_current_variable)
                     .map(|s| s.as_str())
@@ -67,12 +70,21 @@ impl Runnable for Input {
             }
 
             let is_current = variable_name == variable;
-            let variable_color = if is_current { active_color } else { inactive_color };
+            let variable_color = if is_current {
+                active_color
+            } else {
+                inactive_color
+            };
             let env_variable_name = env_var::escape(variable_name);
 
             let value = if is_current {
                 let v = selection.trim_matches('\'');
-                if v.is_empty() { query.trim_matches('\'') } else { v }.to_string()
+                if v.is_empty() {
+                    query.trim_matches('\'')
+                } else {
+                    v
+                }
+                .to_string()
             } else if let Ok(v) = env_var::get(&env_variable_name) {
                 v
             } else {
