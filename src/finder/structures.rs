@@ -45,6 +45,26 @@ impl Default for Opts {
 
 impl Opts {
     pub fn snippet_default() -> Self {
+        // Build informative header (multiline)
+        let mut first_line_parts = vec![
+            format!("OS: {}", std::env::consts::OS),
+        ];
+
+        // Add current working directory (for path filtering context)
+        if let Ok(cwd) = std::env::current_dir() {
+            first_line_parts.push(format!("Path: {}", cwd.display()));
+        }
+
+        // Add tag filter info
+        if let Some(tags) = CONFIG.tag_rules() {
+            first_line_parts.push(format!("Tag filter: {}", tags));
+        }
+
+        let first_line = first_line_parts.join(" | ");
+        let second_line = "Enter: execute | Ctrl+Y: copy | Ctrl+O: edit file | Ctrl+E: edit command";
+
+        let header = format!("{}\n{}", first_line, second_line);
+
         Self {
             suggestion_type: SuggestionType::SnippetSelection,
             overrides: CONFIG.fzf_overrides(),
@@ -60,6 +80,7 @@ impl Opts {
             } else {
                 None
             },
+            header: Some(header),
             ..Default::default()
         }
     }
