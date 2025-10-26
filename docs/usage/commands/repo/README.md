@@ -41,8 +41,8 @@ This includes using an HTTPS URL or an SSH URI.
     navi repo add git@github.com:denisidoro/cheats
     ```
 
-> [!CAUTION]
-> Despite `$NAVI_PATH` being set, it will not be used when installing cheat sheets directly via navi's own commands.\
-> For example when running `navi add repo <repo>`, the default paths will still be used.
-> 
-> To avoid this, you may simply clone repos via a regular `git clone` command, directly into `$NAVI_PATH`.
+> [!TIP]
+> Repositories are cloned into the default cheatsheets directory. To use a custom path, you can:
+> - Clone the repository manually to your preferred location
+> - Use the `--path` CLI argument to specify a custom cheatsheets directory
+> - Configure custom paths in your `config.toml` file

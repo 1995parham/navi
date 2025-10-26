@@ -42,7 +42,7 @@ impl Runnable for Input {
             }
             Info::ConfigExample => println!(
                 "{}",
-                include_str!("../../docs/examples/configuration/config-example.yaml")
+                include_str!("../../docs/examples/configuration/config-example.toml")
             ),
 
             // Here should be the old deprecated default value commands

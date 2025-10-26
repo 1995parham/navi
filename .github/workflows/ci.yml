@@ -15,18 +15,7 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v5
 
-      - name: Prep environment to test compiled-in paths
-        run: |
-          mkdir /tmp/cheats-dir
-          touch /tmp/config-file
-
       - name: Run cargo test
-        run: cargo test
-        env:
-          NAVI_PATH: /tmp/cheats-dir
-          NAVI_CONFIG: /tmp/config-file
-
-      - name: Run cargo test (default paths)
         run: cargo test
 
       - name: Install deps

@@ -16,10 +16,6 @@ use clap::{Parser, Subcommand, crate_authors, crate_version};
     after_help = "\x1b[0;33mMORE INFO:\x1b[0;0m
     Please refer to \x1b[0;32mhttps://github.com/1995parham/navi\x1b[0;0m
 
-\x1b[0;33mENVIRONMENT VARIABLES:\x1b[0m
-    \x1b[0;32mNAVI_CONFIG\x1b[0;0m            # path to config file
-    \x1b[0;32mNAVI_CONFIG_YAML\x1b[0;0m       # config file content
-
 \x1b[0;33mFEATURE STABILITY:\x1b[0m
     \x1b[0;32mexperimental\x1b[0;0m           # may be removed or changed at any time
     \x1b[0;32mdeprecated\x1b[0;0m             # may be removed in 3 months after first being deprecated

@@ -136,15 +136,6 @@ test their modifications but can be used by end users who want to build their ow
 > Install it with: `cargo install just`
 > Run `just --list` to see all available commands.
 
-## Compile time environment variables
-
-**navi** supports environment variables at compile time that will modify the behavior of navi at runtime, they are:
-
-| Environment variable | Description                                                 |
-| -------------------- | ----------------------------------------------------------- |
-| `NAVI_PATH`          | This defines the default path used by navi for cheatsheets. |
-| `NAVI_CONFIG`        | This defines the default configuration file used by navi.   |
-
 ## Other package managers
 
 You can find **navi** for more package managers by clicking on the image below:

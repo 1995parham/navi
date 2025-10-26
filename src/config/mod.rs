@@ -1,36 +1,32 @@
 mod cli;
-mod env;
-mod yaml;
+mod toml;
 
 use crate::commands::func::Func;
 use crate::finder::FinderChoice;
 use crate::prelude::debug;
 pub use cli::*;
 use crossterm::style::Color;
-use env::EnvConfig;
-use yaml::YamlConfig;
+use toml::TomlConfig;
 
 lazy_static! {
     pub static ref CONFIG: Config = Config::new();
 }
 #[derive(Debug)]
 pub struct Config {
-    yaml: YamlConfig,
+    toml: TomlConfig,
     clap: ClapConfig,
-    env: EnvConfig,
 }
 
 impl Config {
     pub fn new() -> Self {
-        let env = EnvConfig::new();
-        let yaml = YamlConfig::get(&env).unwrap_or_else(|e| {
+        let toml = TomlConfig::get().unwrap_or_else(|e| {
             eprintln!("Error parsing config file: {e}");
             eprintln!("Fallbacking to default one...");
             eprintln!();
-            YamlConfig::default()
+            TomlConfig::default()
         });
         let clap = ClapConfig::new();
-        Self { yaml, clap, env }
+        Self { toml, clap }
     }
 
     pub fn best_match(&self) -> bool {
@@ -70,31 +66,24 @@ impl Config {
             .path
             .clone()
             .or_else(|| {
-                if self.env.path.is_some() {
-                    debug!("ENV PATH: {}", self.env.path.as_ref().unwrap());
-                }
-
-                self.env.path.clone()
-            })
-            .or_else(|| {
-                let p = self.yaml.cheats.paths.clone();
+                let p = self.toml.cheats.paths.clone();
 
                 if p.is_empty() {
                     None
                 } else {
-                    debug!("MULTIPLE YAML PATH: {}", p.as_slice().join(","));
+                    debug!("MULTIPLE TOML PATH: {}", p.as_slice().join(","));
                     Some(p.join(crate::filesystem::JOIN_SEPARATOR))
                 }
             })
             .or_else(|| {
-                if self.yaml.cheats.path.is_some() {
+                if self.toml.cheats.path.is_some() {
                     debug!(
-                        "DEPRECATED UNIQUE YAML PATH: {}",
-                        self.yaml.cheats.path.as_ref().unwrap()
+                        "DEPRECATED UNIQUE TOML PATH: {}",
+                        self.toml.cheats.path.as_ref().unwrap()
                     );
                 }
 
-                self.yaml.cheats.path.clone()
+                self.toml.cheats.path.clone()
             })
             .or_else(|| {
                 debug!("No specific path given!");
@@ -106,87 +95,84 @@ impl Config {
     pub fn finder(&self) -> FinderChoice {
         self.clap
             .finder
-            .or(self.env.finder)
-            .unwrap_or(self.yaml.finder.command)
+            .unwrap_or(self.toml.finder.command)
     }
 
     pub fn fzf_overrides(&self) -> Option<String> {
         self.clap
             .fzf_overrides
             .clone()
-            .or_else(|| self.env.fzf_overrides.clone())
-            .or_else(|| self.yaml.finder.overrides.clone())
+            .or_else(|| self.toml.finder.overrides.clone())
     }
 
     pub fn fzf_overrides_var(&self) -> Option<String> {
         self.clap
             .fzf_overrides_var
             .clone()
-            .or_else(|| self.env.fzf_overrides_var.clone())
-            .or_else(|| self.yaml.finder.overrides_var.clone())
+            .or_else(|| self.toml.finder.overrides_var.clone())
     }
 
     pub fn delimiter_var(&self) -> Option<String> {
-        self.yaml.finder.delimiter_var.clone()
+        self.toml.finder.delimiter_var.clone()
     }
 
     pub fn tealdeer(&self) -> bool {
-        self.yaml.client.tealdeer
+        self.toml.client.tealdeer
     }
 
     pub fn shell(&self) -> String {
-        self.yaml.shell.command.clone()
+        self.toml.shell.command.clone()
     }
 
     pub fn finder_shell(&self) -> String {
-        self.yaml
+        self.toml
             .shell
             .finder_command
             .clone()
-            .unwrap_or_else(|| self.yaml.shell.command.clone())
+            .unwrap_or_else(|| self.toml.shell.command.clone())
     }
 
     pub fn tag_rules(&self) -> Option<String> {
         self.clap
             .tag_rules
             .clone()
-            .or_else(|| self.yaml.search.tags.clone())
+            .or_else(|| self.toml.search.tags.clone())
     }
 
     pub fn tag_color(&self) -> Color {
-        self.yaml.style.tag.color.get()
+        self.toml.style.tag.color.get()
     }
 
     pub fn comment_color(&self) -> Color {
-        self.yaml.style.comment.color.get()
+        self.toml.style.comment.color.get()
     }
 
     pub fn snippet_color(&self) -> Color {
-        self.yaml.style.snippet.color.get()
+        self.toml.style.snippet.color.get()
     }
 
     pub fn tag_width_percentage(&self) -> u16 {
-        self.yaml.style.tag.width_percentage
+        self.toml.style.tag.width_percentage
     }
 
     pub fn comment_width_percentage(&self) -> u16 {
-        self.yaml.style.comment.width_percentage
+        self.toml.style.comment.width_percentage
     }
 
     pub fn snippet_width_percentage(&self) -> u16 {
-        self.yaml.style.snippet.width_percentage
+        self.toml.style.snippet.width_percentage
     }
 
     pub fn tag_min_width(&self) -> u16 {
-        self.yaml.style.tag.min_width
+        self.toml.style.tag.min_width
     }
 
     pub fn comment_min_width(&self) -> u16 {
-        self.yaml.style.comment.min_width
+        self.toml.style.comment.min_width
     }
 
     pub fn snippet_min_width(&self) -> u16 {
-        self.yaml.style.snippet.min_width
+        self.toml.style.snippet.min_width
     }
 
     #[cfg(feature = "disable-command-execution")]

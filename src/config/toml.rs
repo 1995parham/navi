@@ -1,4 +1,3 @@
-use super::env::EnvConfig;
 use crate::common::fs;
 use crate::filesystem::default_config_pathbuf;
 use crate::finder::FinderChoice;
@@ -88,7 +87,7 @@ pub struct Client {
 
 #[derive(Deserialize, Debug)]
 #[serde(default)]
-pub struct YamlConfig {
+pub struct TomlConfig {
     pub style: Style,
     pub finder: Finder,
     pub cheats: Cheats,
@@ -98,48 +97,30 @@ pub struct YamlConfig {
     pub source: String, // <= The source of the current configuration
 }
 
-impl YamlConfig {
-    fn from_str(text: &str) -> Result<Self> {
-        serde_yaml::from_str(text).map_err(|e| e.into())
-    }
-
+impl TomlConfig {
     fn from_path(path: &Path) -> Result<Self> {
         let file = fs::open(path)?;
-        let reader = BufReader::new(file);
-        serde_yaml::from_reader(reader).map_err(|e| e.into())
+        let mut reader = BufReader::new(file);
+        let mut content = String::new();
+        std::io::Read::read_to_string(&mut reader, &mut content)?;
+        toml::from_str(&content).map_err(|e| e.into())
     }
 
-    pub fn get(env: &EnvConfig) -> Result<YamlConfig> {
-        if let Some(yaml) = env.config_yaml.as_ref() {
-            // We're getting the configuration from the environment variable `NAVI_CONFIG_YAML`
-            let mut cfg = Self::from_str(yaml)?;
-            cfg.source = "ENV_NAVI_CONFIG_YAML".to_string();
-
-            return Ok(cfg);
-        }
-        if let Some(path_str) = env.config_path.as_ref() {
-            // We're getting the configuration from a file given in the environment variable 'NAVI_CONFIG'
-
-            let p = PathBuf::from(path_str);
-            let mut cfg = YamlConfig::from_path(&p)?;
-            cfg.source = "ENV_NAVI_CONFIG".to_string();
-
-            return Ok(cfg);
-        }
+    pub fn get() -> Result<TomlConfig> {
         if let Ok(p) = default_config_pathbuf() {
             // We're getting the configuration from the default path
 
             if p.exists() {
-                let mut cfg = YamlConfig::from_path(&p)?;
+                let mut cfg = TomlConfig::from_path(&p)?;
                 cfg.source = "DEFAULT_CONFIG_FILE".to_string();
 
                 return Ok(cfg);
             }
         }
 
-        // As no configuration has been found, we set the YAML configuration
+        // As no configuration has been found, we set the TOML configuration
         // to be its default (built-in) value.
-        Ok(YamlConfig::default())
+        Ok(TomlConfig::default())
     }
 }
 
@@ -191,7 +172,7 @@ impl Default for Shell {
     }
 }
 
-impl Default for YamlConfig {
+impl Default for TomlConfig {
     fn default() -> Self {
         Self {
             style: Default::default(),

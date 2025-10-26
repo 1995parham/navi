@@ -8,7 +8,6 @@ use etcetera::BaseStrategy;
 use regex::Regex;
 
 use std::cell::RefCell;
-use std::path::MAIN_SEPARATOR;
 
 use walkdir::WalkDir;
 
@@ -33,36 +32,12 @@ fn paths_from_path_param(env_var: &str) -> impl Iterator<Item = &str> {
     env_var.split(JOIN_SEPARATOR).filter(|folder| folder != &"")
 }
 
-fn compiled_default_path(path: Option<&str>) -> Option<PathBuf> {
-    match path {
-        Some(path) => {
-            let path = if path.contains(MAIN_SEPARATOR) {
-                path.split(MAIN_SEPARATOR).next().unwrap()
-            } else {
-                path
-            };
-            let path = Path::new(path);
-            if path.exists() {
-                Some(path.to_path_buf())
-            } else {
-                None
-            }
-        }
-        None => None,
-    }
-}
-
 pub fn default_cheat_pathbuf() -> Result<PathBuf> {
     let mut pathbuf = get_data_dir_by_platform()?;
 
     pathbuf.push("navi");
     pathbuf.push("cheats");
 
-    if pathbuf.exists()
-        && let Some(path) = compiled_default_path(option_env!("NAVI_PATH"))
-    {
-        pathbuf = path;
-    }
     Ok(pathbuf)
 }
 
@@ -70,13 +45,8 @@ pub fn default_config_pathbuf() -> Result<PathBuf> {
     let mut pathbuf = get_config_dir_by_platform()?;
 
     pathbuf.push("navi");
-    pathbuf.push("config.yaml");
+    pathbuf.push("config.toml");
 
-    if !pathbuf.exists()
-        && let Some(path) = compiled_default_path(option_env!("NAVI_CONFIG"))
-    {
-        pathbuf = path;
-    }
     Ok(pathbuf)
 }
 
@@ -282,7 +252,7 @@ mod tests {
         let expected = {
             let mut e = base_dirs.config_dir();
             e.push("navi");
-            e.push("config.yaml");
+            e.push("config.toml");
             e.to_string_lossy().to_string()
         };
 
@@ -311,7 +281,7 @@ mod tests {
     #[test]
     #[cfg(target_family = "windows")]
     fn multiple_paths() {
-        let p = r#"C:\Users\Administrator\AppData\Roaming\navi\config.yaml"#;
+        let p = r#"C:\Users\Administrator\AppData\Roaming\navi\config.toml"#;
         let paths = &[p; 2].join(JOIN_SEPARATOR);
         assert_eq!(paths_from_path_param(paths).collect::<Vec<_>>(), [p; 2]);
     }

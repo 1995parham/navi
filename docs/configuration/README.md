@@ -1,31 +1,10 @@
 # Configuring Navi
 
-Navi allows you to configure it with a YAML configuration.
+Navi allows you to configure it with a TOML configuration file.
 
-<!-- TOC -->
-* [Configuring Navi](#configuring-navi)
-  * [Paths and Environment Variables](#paths-and-environment-variables)
-    * [The default configuration file path](#the-default-configuration-file-path)
-    * [Cheatsheets paths](#cheatsheets-paths)
-      * [The default cheatsheets path](#the-default-cheatsheets-path)
-      * [Defining the cheatsheets path with the environment variable](#defining-the-cheatsheets-path-with-the-environment-variable)
-      * [Defining the cheatsheets path in the configuration file](#defining-the-cheatsheets-path-in-the-configuration-file)
-        * [[DEPRECATED] - Using the `path` directive](#deprecated---using-the-path-directive)
-  * [Customization](#customization)
-    * [Changing colors](#changing-colors)
-      * [fzf color scheme](#fzf-color-scheme)
-      * [Navi colors](#navi-colors)
-    * [Resizing columns](#resizing-columns)
-    * [Overriding fzf options](#overriding-fzf-options)
-      * [Overriding during cheats selection](#overriding-during-cheats-selection)
-      * [Overriding during values selection](#overriding-during-values-selection)
-      * [Overriding for all cases](#overriding-for-all-cases)
-  * [Defining your own delimiter](#defining-your-own-delimiter)
-<!-- TOC -->
+## Paths
 
-## Paths and Environment Variables
-
-On the technical side, navi uses the `directories-next` crate for rust,
+On the technical side, navi uses the `etcetera` crate for rust,
 which defines platform-specific locations to store the configuration files,
 the cache and other types of files an application might need.
 
@@ -33,14 +12,12 @@ the cache and other types of files an application might need.
 > For example, this is why cheatsheets are being stored in `~/Library/Application Support/navi` on macOS.
 
 > [!NOTE]
-> Interested on how `directories-next` works?\
-> Go see their `crates.io` page: [crates.io/crates/directories-next](https://crates.io/crates/directories-next)
-
+> Interested on how `etcetera` works?\
+> Go see their `crates.io` page: [crates.io/crates/etcetera](https://crates.io/crates/etcetera)
 
 ### The default configuration file path
 
-During the compilation of navi, the default configuration file path is set by the `$NAVI_CONFIG` environment variable.\
-If it is not set, it fallbacks to `~/.config/navi/config.yaml`.
+The default configuration file path is `~/.config/navi/config.toml` (on Linux/macOS) or `%APPDATA%\navi\config.toml` (on Windows).
 
 You can check your default configuration file path with the info subcommand,
 see [/docs/usage/commands/info/](/docs/usage/commands/info/README.md#default-configuration-path) for more details.
@@ -49,7 +26,7 @@ see [/docs/usage/commands/info/](/docs/usage/commands/info/README.md#default-con
 
 Navi checks the paths in the following order until it finds a value:
 
-1. the `$NAVI_PATH` environment variable
+1. the `--path` command-line argument
 2. the configuration file
 3. The default value of navi
 
@@ -60,35 +37,17 @@ By default, navi stores the cheatsheets in the `~/.local/share/navi/cheats/` dir
 You can check your default cheatsheets path with the info subcommand,
 see [/docs/usage/commands/info/](/docs/usage/commands/info/README.md#default-cheatsheets-path) for more details.
 
-#### Defining the cheatsheets path with the environment variable
-
-The cheatsheets path can be defined using the `$NAVI_PATH` environment variable in a colon-separated list, for example:
-
-```sh
-export NAVI_PATH='/path/to/a/dir:/path/to/another/dir:/yet/another/dir'
-```
-
 #### Defining the cheatsheets path in the configuration file
 
 You can define the cheatsheets path in the configuration file with the following syntax:
 
-```yaml
-cheats:
-  paths:
-    - /path/to/some/dir # on unix-like os
-    - F:\\path\\to\\dir # on Windows
+```toml
+[cheats]
+paths = [
+    "/path/to/some/dir",  # on unix-like os
+    "F:\\path\\to\\dir"   # on Windows
+]
 ```
-
-##### [DEPRECATED] - Using the `path` directive
-
-Until `2.17.0`, you could define your cheatsheets path with the `path` directive with the following syntax:
-
-```yaml
-cheats:
-  path: /path/to/some/dir
-```
-
-The directive is now deprecated and will be removed in `2.27.0`.
 
 ## Customization
 
@@ -106,28 +65,30 @@ You can change the color scheme of `fzf` by overriding fzf options.
 
 You can change the text color for each column of navi in the configuration file with the following syntax:
 
-```yaml
-style:
-  tag:
-    color: <your color for tags>
-  comment:
-    color: <your color for comments>
-  snippet:
-    color: <your color for snippets>
+```toml
+[style.tag]
+color = "<your color for tags>"
+
+[style.comment]
+color = "<your color for comments>"
+
+[style.snippet]
+color = "<your color for snippets>"
 ```
 
 Below is an example of what to do if you'd like navi to look like the French flag:
 
-- `config.yaml`:
+- `config.toml`:
 
-  ```yaml
-  style:
-    tag:
-      color: blue
-    comment:
-      color: white
-    snippet:
-      color: red
+  ```toml
+  [style.tag]
+  color = "blue"
+
+  [style.comment]
+  color = "white"
+
+  [style.snippet]
+  color = "red"
   ```
 
 - The result:
@@ -138,72 +99,47 @@ Below is an example of what to do if you'd like navi to look like the French fla
 
 You can change the column width of each column of navi in the configuration file with the following syntax:
 
-```yaml
-style:
-  tag:
-    width_percentage: <width relative to the terminal window>
-    min_width: <width as number of characters>
-  comment:
-    width_percentage: <width relative to the terminal window>
-    min_width: <width as number of characters>
-  snippet:
-    width_percentage: <width relative to the terminal window>
-    min_width: <width as number of characters>
+```toml
+[style.tag]
+width_percentage = <width relative to the terminal window>
+min_width = <width as number of characters>
+
+[style.comment]
+width_percentage = <width relative to the terminal window>
+min_width = <width as number of characters>
+
+[style.snippet]
+width_percentage = <width relative to the terminal window>
+min_width = <width as number of characters>
 ```
 
 ### Overriding fzf options
 
-You can override fzf options for two different cases:
+You can override fzf options for different cases using the configuration file or command-line arguments:
 
-- During the cheats selection
+- During the cheats selection: use the `overrides` directive or `--fzf-overrides` CLI argument
+- During the pre-defined variable values selection: use the `overrides_var` directive or `--fzf-overrides-var` CLI argument
+- For all cases: use the `FZF_DEFAULT_OPTS` environment variable
 
-  Navi exposes the `overrides` directive in the configuration file
-  and the `NAVI_FZF_OVERRIDES` environment variable.
+**Example - Overriding during cheats selection:**
 
-- During the pre-defined variable values selection
-
-  Navi exposes the `overrides_var` directive in the configuration file
-  and the `NAVI_FZF_OVERRIDES_VAR` environment variable.
-
-For all cases, navi exposes the `FZF_DEFAULT_OPTS` environment variable.
-
-#### Overriding during cheats selection
-
-If you want to do the override with `--height 3`,
-you can do it with the following syntax in the configuration file:
-
-```yaml
-finder:
-  command: fzf
-  overrides: --height 3
+```toml
+[finder]
+command = "fzf"
+overrides = "--height 3"
 ```
 
-But you can also define the environment variable like this:
+**Example - Overriding during values selection:**
 
-```bash
-export NAVI_FZF_OVERRIDES='--height 3'
+```toml
+[finder]
+command = "fzf"
+overrides_var = "--height 3"
 ```
 
-#### Overriding during values selection
+**Example - Overriding for all cases:**
 
-If you want to do the override with `--height 3`,
-you can do it with the following syntax in the configuration file:
-
-```yaml
-finder:
-  command: fzf
-  overrides_var: --height 3
-```
-
-But you can also define the environment variable like this:
-
-```bash
-export NAVI_FZF_OVERRIDES_VAR='--height 3'
-```
-
-#### Overriding for all cases
-
-You can define the environment variable like this:
+You can define the FZF environment variable like this:
 
 ```bash
 export FZF_DEFAULT_OPTS="--height 3"
@@ -219,9 +155,9 @@ It is equivalent to defining `--delimiter` used with `--column`.
 
 You can define it as such:
 
-```yaml
-finder:
-  delimiter_var: <your-regex-delimiter> ### By default the expression is \s\s+
+```toml
+[finder]
+delimiter_var = "<your-regex-delimiter>"  # By default the expression is \s\s+
 ```
 
 > [!CAUTION]
@@ -230,4 +166,3 @@ finder:
 
 You can override this configuration with the `--delimiter` instruction in the variable definition of your cheat.\
 See [/docs/cheatsheet/syntax/](/docs/cheatsheet/syntax/README.md#advanced-variable-options) for more details.
-
