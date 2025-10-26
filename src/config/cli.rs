@@ -33,7 +33,7 @@ use clap::{Parser, Subcommand, crate_authors, crate_version};
     navi --query git                             # filter results by \"git\"
     navi --query 'create db' --best-match        # autoselect the snippet that best matches a query
     db=my navi --query 'create db' --best-match  # same, but set the value for the <name> variable
-    navi repo add denisidoro/cheats              # import cheats from a git repository
+    navi repo add <user>/<repo>                  # import cheats from a git repository
     eval \"$(navi widget zsh)\"                    # load the zsh widget
     navi --finder 'skim'                         # set skim as finder, instead of fzf
     navi --fzf-overrides '--with-nth 1,2'        # show only the comment and tag columns

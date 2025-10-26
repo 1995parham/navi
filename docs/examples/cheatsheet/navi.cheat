@@ -1,7 +1,7 @@
 % cheatsheets
-	 
-# Download default cheatsheets
-navi repo add denisidoro/cheats
+
+# Add a cheatsheet repository
+navi repo add <user>/<repo>
 
 # Browse for cheatsheet repos
 navi repo browse
@@ -41,4 +41,4 @@ shell="$(basename $SHELL)"; eval "$(navi widget $shell)"
 navi --help
 
 # Read project README.md
-navi fn url::open "https://github.com/denisidoro/navi"
+navi fn url::open "https://github.com/1995parham/navi"

@@ -16,9 +16,7 @@
 
 ## Browsing through cheatsheet repositories
 
-Navi lets you browse featured [GitHub](https://github.com) repositories registered in [@denisidoro/cheats/featured_repos.txt](https://github.com/denisidoro/cheats/blob/master/featured_repos.txt).
-
-You can find them within navi with the following command:
+You can browse cheatsheet repositories with the following command:
 
 ```sh
 navi repo browse
@@ -32,13 +30,13 @@ This includes using an HTTPS URL or an SSH URI.
 - Import using HTTPS
 
     ```sh
-    navi repo add https://github.com/denisidoro/cheats
+    navi repo add https://github.com/<user>/<repo>
     ```
 
 - Import using SSH
 
     ```shell
-    navi repo add git@github.com:denisidoro/cheats
+    navi repo add git@github.com:<user>/<repo>
     ```
 
 > [!TIP]

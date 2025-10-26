@@ -22,10 +22,8 @@ See [/docs/usage/commands/repo](/docs/usage/commands/repo/README.md#importing-ch
 
 ## Submitting cheatsheets
 
-The featured repository for cheatsheets is [denisidoro/cheats](https://github.com/denisidoro/cheats),
-feel free to open a PR[^1] there for me to include your contributions.
-
-In order to add your own repository as a featured cheatsheet repo, please [edit this file](https://github.com/denisidoro/cheats/edit/master/featured_repos.txt) and open a PR[^1].
+You can create and maintain your own cheatsheet repositories.
+Feel free to share them with the community.
 
 ## Auto-updating repositories
 

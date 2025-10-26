@@ -54,8 +54,6 @@ There are multiple ways to use **navi**:
 - as [aliases](docs/cheatsheet/syntax/README.md#aliases)
 - as a [shell scripting tool](docs/usage/shell-scripting/README.md)
 
-In particular, check [these instructions](https://github.com/denisidoro/navi/issues/491) if you want to replicate what's shown in the demo above.
-
 ## Cheatsheet repositories
 
 Running **navi** for the first time will help you download and manage cheatsheets. By default, they are stored at `~/.local/share/navi/cheats/`.

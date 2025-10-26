@@ -10,10 +10,6 @@ You can use Navi with shell scripting.
   * [Selecting the best match for a variable](#selecting-the-best-match-for-a-variable)
 <!-- TOC -->
 
-> [NOTE!]
-> The following blog post gives you an example of a real world scenario: [denisidoro.github.io/posts/cli-templates/](https://denisidoro.github.io/posts/cli-templates/)
-
-
 ## Simply calling a cheat
 
 Below is an example on how to call a cheat from within navi:

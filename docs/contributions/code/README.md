@@ -35,7 +35,7 @@ your changes to be accepted.
     No significant modification in Navi's behaviour should be merged without being documented.\
     For more details I recommend you to see [contributions/documentation/](../documentation/README.md).
 
-5. Open a PR on [denisidoro/navi](https://github.com/denisidoro/navi/pulls) and request a review
+5. Open a PR on [1995parham/navi](https://github.com/1995parham/navi/pulls) and request a review
 6. [Optional] Your PR needs revisions and changes before it can be merged
 
     It's not rare that your PR will need changes before it can be accepted by the maintainers

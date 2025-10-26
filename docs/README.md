@@ -1,9 +1,9 @@
-# Navi <img src="https://raw.githubusercontent.com/denisidoro/navi/master/assets/icon.png" alt="icon" height="28px"/> [![Actions Status](https://github.com/denisidoro/navi/workflows/CI/badge.svg)](https://github.com/denisidoro/navi/actions) ![GitHub release](https://img.shields.io/github/v/release/denisidoro/navi?include_prereleases)
+# Navi <img src="https://raw.githubusercontent.com/1995parham/navi/main/assets/icon.png" alt="icon" height="28px"/> [![Actions Status](https://github.com/1995parham/navi/workflows/CI/badge.svg)](https://github.com/1995parham/navi/actions) ![GitHub release](https://img.shields.io/github/v/release/1995parham/navi?include_prereleases)
 
 ## Table of Contents
 
 <!-- TOC -->
-* [Navi <img src="https://raw.githubusercontent.com/denisidoro/navi/master/assets/icon.png" alt="icon" height="28px"/> ![Actions Status](https://github.com/denisidoro/navi/workflows/CI/badge.svg) ![GitHub release](https://img.shields.io/github/v/release/denisidoro/navi?include_prereleases)](#navi-img-srchttpsrawgithubusercontentcomdenisidoronavimasterassetsiconpng-alticon-height28px--)
+* [Navi <img src="https://raw.githubusercontent.com/1995parham/navi/main/assets/icon.png" alt="icon" height="28px"/> ![Actions Status](https://github.com/1995parham/navi/workflows/CI/badge.svg) ![GitHub release](https://img.shields.io/github/v/release/1995parham/navi?include_prereleases)](#navi-img-srchttpsrawgithubusercontentcom1995parhamnavimainassetsiconpng-alticon-height28px--)
   * [Table of Contents](#table-of-contents)
   * [About](#about)
   * [Navi Pros](#navi-pros)
@@ -29,7 +29,7 @@ It uses [fzf](https://github.com/junegunn/fzf), [skim](https://github.com/lotabo
 
 ## Similar tools
 
-There are many similar projects out there ([beavr](https://github.com/denisidoro/beavr), [bro](https://github.com/hubsmoke/bro), [cheat](https://github.com/cheat/cheat), [cheat.sh](https://github.com/chubin/cheat.sh), [cmdmenu](https://github.com/amacfie/cmdmenu), [eg](https://github.com/srsudar/eg), [how2](https://github.com/santinic/how2), [howdoi](https://github.com/gleitz/howdoi), [Command Line Interface Pages](https://github.com/command-line-interface-pages) and [tldr](https://github.com/tldr-pages/tldr), to name a few).
+There are many similar projects out there ([bro](https://github.com/hubsmoke/bro), [cheat](https://github.com/cheat/cheat), [cheat.sh](https://github.com/chubin/cheat.sh), [cmdmenu](https://github.com/amacfie/cmdmenu), [eg](https://github.com/srsudar/eg), [how2](https://github.com/santinic/how2), [howdoi](https://github.com/gleitz/howdoi), [Command Line Interface Pages](https://github.com/command-line-interface-pages) and [tldr](https://github.com/tldr-pages/tldr), to name a few).
 
 They are excellent projects, but **navi** remains unique in the following ways:
 

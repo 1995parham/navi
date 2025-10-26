@@ -81,25 +81,11 @@ choco install navi
 > [!NOTE]
 > See [community.chocolatey.org](https://community.chocolatey.org) for more details.
 
-## Using the installation script
-
-Navi has an installation script ready for you to use, you can call it like this:
-
-```bash
-bash <(curl -sL https://raw.githubusercontent.com/denisidoro/navi/master/scripts/install)
-```
-
-If you need to define the directory for the binary, you can call it like this:
-
-```bash
-BIN_DIR=/usr/local/bin bash <(curl -sL https://raw.githubusercontent.com/denisidoro/navi/master/scripts/install)
-```
-
 ## Downloading pre-compiled binaries
 
 With each release, we try our best to build and publish a binary for each
 supported platform, you can find them here:
-[@denisidoro/navi/releases/latest](https://github.com/denisidoro/navi/releases/latest)
+[@1995parham/navi/releases/latest](https://github.com/1995parham/navi/releases/latest)
 
 What you need to do is:
 
@@ -114,7 +100,7 @@ test their modifications but can be used by end users who want to build their ow
 - You need to clone the repository:
 
   ```bash
-  git clone https://github.com/denisidoro/navi && cd navi
+  git clone https://github.com/1995parham/navi && cd navi
   ```
 
 - Install using `just` (recommended) or `cargo`
