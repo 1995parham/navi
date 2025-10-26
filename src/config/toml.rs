@@ -1,4 +1,3 @@
-use crate::common::fs;
 use crate::filesystem::default_config_pathbuf;
 use crate::finder::FinderChoice;
 use crate::prelude::*;
@@ -99,11 +98,8 @@ pub struct TomlConfig {
 
 impl TomlConfig {
     fn from_path(path: &Path) -> Result<Self> {
-        let file = fs::open(path)?;
-        let mut reader = BufReader::new(file);
-        let mut content = String::new();
-        std::io::Read::read_to_string(&mut reader, &mut content)?;
-        toml::from_str(&content).map_err(|e| e.into())
+        let content = std::fs::read_to_string(path)?;
+        toml::from_str(&content).map_err(Into::into)
     }
 
     pub fn get() -> Result<TomlConfig> {

@@ -1,16 +1,14 @@
-#[macro_use]
-extern crate lazy_static;
-
 mod clients;
 mod commands;
 mod common;
 mod config;
-mod deser;
+mod display;
 mod env_var;
 mod filesystem;
 mod finder;
 mod parser;
 pub mod prelude;
+mod preview_context;
 mod structures;
 mod welcome;
 

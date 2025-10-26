@@ -1,16 +1,30 @@
 use crate::prelude::*;
 use unicode_width::UnicodeWidthStr;
 
-pub mod raycast;
 pub mod terminal;
 
-const NEWLINE_ESCAPE_CHAR: char = '\x15';
-pub const LINE_SEPARATOR: &str = " \x15 ";
+/// Magic constants for display formatting
+pub mod constants {
+    /// Character used as a temporary placeholder for newlines in single-line display
+    pub const NEWLINE_ESCAPE_CHAR: char = '\x15';
 
-lazy_static! {
-    pub static ref NEWLINE_REGEX: Regex = Regex::new(r"\\\s+").expect("Invalid regex");
-    pub static ref VAR_REGEX: Regex = Regex::new(r"\\?<(\w[\w\d\-_]*)>").expect("Invalid regex");
+    /// Visual separator for multi-line commands (space + escape char + space)
+    pub const LINE_SEPARATOR: &str = " \x15 ";
+
+    /// Field separator for terminal display (invisible Braille pattern)
+    pub const FIELD_SEPARATOR: &str = "  ⠀";
 }
+
+// Re-export commonly used constants for backward compatibility
+const NEWLINE_ESCAPE_CHAR: char = constants::NEWLINE_ESCAPE_CHAR;
+pub const LINE_SEPARATOR: &str = constants::LINE_SEPARATOR;
+
+use std::sync::LazyLock;
+
+pub static NEWLINE_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"\\\s+").expect("Invalid regex"));
+pub static VAR_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"\\?<(\w[\w\d\-_]*)>").expect("Invalid regex"));
 
 pub fn with_new_lines(txt: String) -> String {
     txt.replace(LINE_SEPARATOR, "\n")

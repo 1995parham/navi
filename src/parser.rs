@@ -1,5 +1,5 @@
 use crate::common::fs;
-use crate::deser;
+use crate::display;
 use crate::finder::structures::{Opts as FinderOpts, SuggestionType};
 use crate::prelude::*;
 use crate::structures::cheat::VariableMap;
@@ -7,10 +7,10 @@ use crate::structures::item::Item;
 use std::env;
 use std::io::Write;
 
-lazy_static! {
-    pub static ref VAR_LINE_REGEX: Regex =
-        Regex::new(r"^\$\s*([^:]+):(.*)").expect("Invalid regex");
-}
+use std::sync::LazyLock;
+
+pub static VAR_LINE_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"^\$\s*([^:]+):(.*)").expect("Invalid regex"));
 
 fn parse_opts(text: &str) -> Result<FinderOpts> {
     let mut multi = false;
@@ -235,12 +235,8 @@ fn gen_lists(tag_rules: &str) -> FilterOpts {
 }
 
 impl<'a> Parser<'a> {
-    pub fn new(writer: &'a mut dyn Write, is_terminal: bool) -> Self {
-        let write_fn = if is_terminal {
-            deser::terminal::write
-        } else {
-            deser::raycast::write
-        };
+    pub fn new(writer: &'a mut dyn Write, _is_terminal: bool) -> Self {
+        let write_fn = display::terminal::write;
 
         let filter = match CONFIG.tag_rules() {
             Some(tr) => gen_lists(&tr),
@@ -344,7 +340,7 @@ impl<'a> Parser<'a> {
             // blank
             if line.is_empty() {
                 if !item.snippet.is_empty() {
-                    item.snippet.push_str(deser::LINE_SEPARATOR);
+                    item.snippet.push_str(display::LINE_SEPARATOR);
                 }
             }
             // tag
@@ -358,10 +354,6 @@ impl<'a> Parser<'a> {
                 let tags_dependency = without_prefix(&line);
                 self.variables
                     .insert_dependency(&item.tags, &tags_dependency);
-            }
-            // raycast icon
-            else if let Some(icon) = line.strip_prefix("; raycast.icon:") {
-                item.icon = Some(icon.trim().into());
             }
             // path filter
             else if let Some(path) = line.strip_prefix("; path:") {
@@ -415,7 +407,7 @@ impl<'a> Parser<'a> {
             // snippet
             else {
                 if !item.snippet.is_empty() {
-                    item.snippet.push_str(deser::LINE_SEPARATOR);
+                    item.snippet.push_str(display::LINE_SEPARATOR);
                 }
                 item.snippet.push_str(&line);
             }

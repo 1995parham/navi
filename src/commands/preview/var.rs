@@ -1,4 +1,4 @@
-use crate::deser;
+use crate::display;
 use crate::env_var;
 use crate::finder;
 use crate::prelude::*;
@@ -49,7 +49,7 @@ impl Runnable for Input {
 
         let bracketed_variables: Vec<&str> = {
             if snippet.contains(&bracketed_current_variable) {
-                deser::VAR_REGEX
+                display::VAR_REGEX
                     .find_iter(&snippet)
                     .map(|m| m.as_str())
                     .collect()
@@ -113,7 +113,7 @@ impl Runnable for Input {
             );
         }
 
-        println!("{snippet}", snippet = deser::fix_newlines(&colored_snippet));
+        println!("{snippet}", snippet = display::fix_newlines(&colored_snippet));
         println!("{variables}");
 
         process::exit(0)

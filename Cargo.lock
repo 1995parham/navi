@@ -424,7 +424,6 @@ dependencies = [
  "dunce",
  "edit",
  "etcetera",
- "lazy_static",
  "regex",
  "remove_dir_all",
  "serde",

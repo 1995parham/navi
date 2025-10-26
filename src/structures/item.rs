@@ -6,7 +6,6 @@ pub struct Item {
     pub comment: String,
     pub snippet: String,
     pub file_index: Option<usize>,
-    pub icon: Option<String>,
     pub path_filter: Option<String>,
     pub os_filter: Option<String>,
 }

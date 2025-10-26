@@ -3,7 +3,7 @@ use crate::common::fs;
 use crate::common::shell;
 use crate::common::shell::ShellSpawnError;
 use crate::config::Action;
-use crate::deser;
+use crate::display;
 use crate::env_var;
 use crate::finder::structures::{Opts as FinderOpts, SuggestionType};
 use crate::prelude::*;
@@ -171,7 +171,7 @@ fn replace_variables_from_snippet(
         return Ok(interpolated_snippet);
     }
 
-    let variables_found: Vec<&str> = deser::VAR_REGEX
+    let variables_found: Vec<&str> = display::VAR_REGEX
         .find_iter(snippet)
         .map(|m| m.as_str())
         .collect();
@@ -268,7 +268,7 @@ pub fn act(
         )
         .context("Failed to replace variables from snippet")?;
         s = with_absolute_path(s);
-        s = deser::with_new_lines(s);
+        s = display::with_new_lines(s);
         s
     };
 

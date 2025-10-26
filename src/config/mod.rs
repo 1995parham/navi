@@ -8,9 +8,9 @@ pub use cli::*;
 use crossterm::style::Color;
 use toml::TomlConfig;
 
-lazy_static! {
-    pub static ref CONFIG: Config = Config::new();
-}
+use std::sync::LazyLock;
+
+pub static CONFIG: LazyLock<Config> = LazyLock::new(Config::new);
 #[derive(Debug)]
 pub struct Config {
     toml: TomlConfig,

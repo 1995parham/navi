@@ -2,10 +2,12 @@ use crate::config::CONFIG;
 use crate::prelude::*;
 use std::process::{Command, Stdio};
 
-lazy_static! {
-    pub static ref VAR_TLDR_REGEX: Regex = Regex::new(r"\{\{(.*?)\}\}").expect("Invalid regex");
-    pub static ref NON_VAR_CHARS_REGEX: Regex = Regex::new(r"[^\da-zA-Z_]").expect("Invalid regex");
-}
+use std::sync::LazyLock;
+
+pub static VAR_TLDR_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"\{\{(.*?)\}\}").expect("Invalid regex"));
+pub static NON_VAR_CHARS_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"[^\da-zA-Z_]").expect("Invalid regex"));
 
 static VERSION_DISCLAIMER: &str =
     "tldr-c-client (the default one in Homebrew) doesn't support markdown files, so navi can't use it.

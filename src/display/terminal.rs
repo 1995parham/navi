@@ -25,11 +25,11 @@ pub fn get_widths() -> (usize, usize, usize) {
     )
 }
 
-pub const DELIMITER: &str = r"  ⠀";
+pub use crate::display::constants::FIELD_SEPARATOR as DELIMITER;
 
-lazy_static! {
-    pub static ref COLUMN_WIDTHS: (usize, usize, usize) = get_widths();
-}
+use std::sync::LazyLock;
+
+pub static COLUMN_WIDTHS: LazyLock<(usize, usize, usize)> = LazyLock::new(get_widths);
 
 pub fn write(item: &Item) -> String {
     let (tag_width_percentage, comment_width_percentage, snippet_width_percentage) = *COLUMN_WIDTHS;

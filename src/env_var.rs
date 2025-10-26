@@ -11,19 +11,11 @@ pub const PREVIEW_DELIMITER: &str = "NAVI_PREVIEW_DELIMITER";
 pub const PREVIEW_MAP: &str = "NAVI_PREVIEW_MAP";
 
 pub fn parse<T: FromStr>(varname: &str) -> Option<T> {
-    if let Ok(x) = env::var(varname) {
-        x.parse::<T>().ok()
-    } else {
-        None
-    }
+    env::var(varname).ok()?.parse().ok()
 }
 
 pub fn must_get(name: &str) -> String {
-    if let Ok(v) = env::var(name) {
-        v
-    } else {
-        panic!("{name} not set")
-    }
+    env::var(name).unwrap_or_else(|_| panic!("Required environment variable {name} not set"))
 }
 
 pub fn escape(name: &str) -> String {

@@ -1,4 +1,4 @@
-use crate::deser;
+use crate::display;
 use crate::prelude::*;
 use std::io::Write;
 use std::process::{self, Output};
@@ -109,7 +109,7 @@ impl FinderChoice {
             "--preview-window",
             format!("up:{preview_height}:nohidden").as_str(),
             "--delimiter",
-            deser::terminal::DELIMITER.to_string().as_str(),
+            display::terminal::DELIMITER.to_string().as_str(),
             "--ansi",
             "--bind",
             format!("ctrl-j:down,ctrl-k:up{bindings}").as_str(),
