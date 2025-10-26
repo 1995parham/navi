@@ -136,7 +136,7 @@ impl FinderChoice {
                 };
             }
             SuggestionType::SnippetSelection => {
-                command.args(["--expect", "ctrl-y,ctrl-o,enter"]);
+                command.args(["--expect", "ctrl-y,ctrl-o,ctrl-e,enter"]);
             }
             SuggestionType::SingleRecommendation => {
                 command.args(["--print-query", "--expect", "tab,enter"]);

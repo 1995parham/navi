@@ -429,6 +429,7 @@ dependencies = [
  "serde",
  "shellwords",
  "strip-ansi-escapes",
+ "tempfile",
  "thiserror",
  "toml",
  "tracing",

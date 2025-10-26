@@ -10,6 +10,7 @@ use crate::finder::structures::{Opts as FinderOpts, SuggestionType};
 use crate::prelude::*;
 use crate::structures::cheat::{Suggestion, VariableMap};
 use crate::structures::item::Item;
+use std::io::Write as _;
 
 use super::preview;
 use super::suggestion;
@@ -217,6 +218,37 @@ pub fn act(
         s = display::with_new_lines(s);
         s
     };
+
+    // Handle command editing shortcut
+    if key == "ctrl-e" {
+        // Create a temporary file with the snippet
+        let mut temp_file = tempfile::Builder::new()
+            .prefix("navi-")
+            .suffix(".sh")
+            .tempfile()
+            .context("Failed to create temporary file")?;
+
+        // Write the interpolated snippet to the temp file
+        temp_file
+            .write_all(interpolated_snippet.as_bytes())
+            .context("Failed to write snippet to temporary file")?;
+
+        // Get the path before the file is closed
+        let temp_path = temp_file.path().to_path_buf();
+
+        // Open the file in the user's EDITOR
+        edit::edit_file(&temp_path)
+            .context("Failed to open snippet in editor")?;
+
+        // Read back the edited content
+        let edited_snippet = std::fs::read_to_string(&temp_path)
+            .context("Failed to read edited snippet")?;
+
+        // Output the edited snippet for the user to execute
+        println!("{}", edited_snippet.trim_end());
+
+        return Ok(());
+    }
 
     match CONFIG.action() {
         Action::Print => {
