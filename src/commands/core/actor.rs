@@ -26,7 +26,8 @@ fn prompt_finder(
     // Execute suggestion command and get options
     let (suggestions_text, finder_opts) = if let Some((command, opts)) = suggestion_option {
         // Apply suggestion options to preview environment variables
-        let _extra_preview = opts.as_ref()
+        let _extra_preview = opts
+            .as_ref()
             .and_then(|o| suggestion::apply_suggestion_options(&mut preview_env_vars, o));
 
         let text = suggestion::execute_suggestion_command(command, variable_cache)?;
@@ -36,13 +37,9 @@ fn prompt_finder(
     };
 
     // Build shell-specific preview command
-    let extra_preview = finder_opts.as_ref()
-        .and_then(|opts| opts.preview.as_ref());
-    let preview_command = preview::build_preview_command(
-        variable_name,
-        extra_preview,
-        &CONFIG.shell(),
-    );
+    let extra_preview = finder_opts.as_ref().and_then(|opts| opts.preview.as_ref());
+    let preview_command =
+        preview::build_preview_command(variable_name, extra_preview, &CONFIG.shell());
 
     // Build finder options
     let mut opts = FinderOpts {

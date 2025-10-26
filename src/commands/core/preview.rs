@@ -27,21 +27,20 @@ pub fn build_preview_command(
     }
 }
 
-pub fn calculate_preview_window(
-    extra_preview: Option<&String>,
-    variable_count: usize,
-) -> String {
+pub fn calculate_preview_window(extra_preview: Option<&String>, variable_count: usize) -> String {
     if extra_preview.is_none() {
-        format!("{}:{}", constants::DEFAULT_PREVIEW_DIRECTION, variable_count + 3)
+        format!(
+            "{}:{}",
+            constants::DEFAULT_PREVIEW_DIRECTION,
+            variable_count + 3
+        )
     } else {
         constants::EXTRA_PREVIEW_DIRECTION.to_string()
     }
 }
 
 fn format_extra_preview(extra: Option<&String>) -> String {
-    extra
-        .map(|e| format!(" echo; {e}"))
-        .unwrap_or_default()
+    extra.map(|e| format!(" echo; {e}")).unwrap_or_default()
 }
 
 fn build_powershell_preview(exe: &str, name: &str, extra: &str) -> String {

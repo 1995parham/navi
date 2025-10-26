@@ -93,9 +93,7 @@ impl Config {
     }
 
     pub fn finder(&self) -> FinderChoice {
-        self.clap
-            .finder
-            .unwrap_or(self.toml.finder.command)
+        self.clap.finder.unwrap_or(self.toml.finder.command)
     }
 
     pub fn fzf_overrides(&self) -> Option<String> {

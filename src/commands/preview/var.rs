@@ -113,7 +113,10 @@ impl Runnable for Input {
             );
         }
 
-        println!("{snippet}", snippet = display::fix_newlines(&colored_snippet));
+        println!(
+            "{snippet}",
+            snippet = display::fix_newlines(&colored_snippet)
+        );
         println!("{variables}");
 
         process::exit(0)
