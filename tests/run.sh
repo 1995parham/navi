@@ -36,7 +36,7 @@ _navi_cases_test() {
 _get_all_tests() {
 	grep '^#' "${TEST_CHEAT_PATH}/cases.cheat" |
 		grep ' ->' |
-		sed 's/\\n/'"$(printf "%s" "$NEWLINE_CHAR")"'/g' |
+		sed 's/\\n/'"$(printf "$NEWLINE_CHAR")"'/g' |
 		sed -E 's/# (.*) -> "(.*)"/\1|\2/g'
 }
 
