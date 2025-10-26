@@ -18,6 +18,9 @@ jobs:
       - name: Run cargo test
         run: cargo test
 
+      - name: Run cargo build
+        run: cargo build
+
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y git bash tmux
 
