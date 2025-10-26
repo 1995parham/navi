@@ -99,7 +99,7 @@ _integration() {
 	mv "$cheats_path" "$bak_cheats_path" 2>/dev/null || true
 
 	log::note "Starting sessions..."
-	tmux new-session -d -s ci "export NAVI_TEST_PATH='${cheats_path}'; ${NAVI_HOME}/tests/run _navi |& tee '${log_file}'"
+	tmux new-session -d -s ci "export NAVI_TEST_PATH='${cheats_path}'; ${NAVI_HOME}/tests/run.sh _navi |& tee '${log_file}'"
 	sleep 5
 	_assert_tmux "$log_file"
 
