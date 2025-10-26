@@ -2,7 +2,7 @@
 set -euo pipefail
 
 export NAVI_HOME="$(cd "$(dirname "$0")/.." && pwd)"
-source "${NAVI_HOME}/tests/core.bash"
+source "${NAVI_HOME}/tests/core.sh"
 
 export TEST_CHEAT_PATH="${NAVI_HOME}/tests/no_prompt_cheats"
 export NAVI_EXE="${NAVI_HOME}/target/debug/navi"
@@ -19,7 +19,7 @@ _navi() {
   local path="${NAVI_TEST_PATH:-$TEST_CHEAT_PATH}"
   path="${path//$HOME/~}"
   export NAVI_ENV_VAR_PATH="$path"
-  RUST_BACKTRACE=1 "$NAVI_EXE" --path '$NAVI_ENV_VAR_PATH' "$@"
+  RUST_BACKTRACE=1 "$NAVI_EXE" --path "$NAVI_ENV_VAR_PATH" "$@"
 }
 
 _navi_cases() {
@@ -33,8 +33,7 @@ _navi_cases_test() {
 }
 
 _get_all_tests() {
-  cat "${TEST_CHEAT_PATH}/cases.cheat" |
-    grep '^#' |
+  grep '^#' "${TEST_CHEAT_PATH}/cases.cheat" |
     grep ' ->' |
     sed 's/\\n/'"$(printf "$NEWLINE_CHAR")"'/g' |
     sed -E 's/# (.*) -> "(.*)"/\1|\2/g'

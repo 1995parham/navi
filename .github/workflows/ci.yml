@@ -18,8 +18,8 @@ jobs:
       - name: Run cargo test
         run: cargo test
 
-      - name: Install deps
-        run: ./scripts/dot pkg add git bash npm tmux
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y git bash tmux
 
       - name: Install fzf
         run: git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf; yes | ~/.fzf/install;
@@ -31,7 +31,7 @@ jobs:
         run: sudo npm install -g tldr
 
       - name: Run bash tests
-        run: ./tests/run
+        run: ./tests/run.sh
 
   lints:
     name: Lints
