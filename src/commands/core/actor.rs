@@ -237,12 +237,11 @@ pub fn act(
         let temp_path = temp_file.path().to_path_buf();
 
         // Open the file in the user's EDITOR
-        edit::edit_file(&temp_path)
-            .context("Failed to open snippet in editor")?;
+        edit::edit_file(&temp_path).context("Failed to open snippet in editor")?;
 
         // Read back the edited content
-        let edited_snippet = std::fs::read_to_string(&temp_path)
-            .context("Failed to read edited snippet")?;
+        let edited_snippet =
+            std::fs::read_to_string(&temp_path).context("Failed to read edited snippet")?;
 
         // Output the edited snippet for the user to execute
         println!("{}", edited_snippet.trim_end());

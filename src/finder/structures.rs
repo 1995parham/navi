@@ -46,9 +46,7 @@ impl Default for Opts {
 impl Opts {
     pub fn snippet_default() -> Self {
         // Build informative header (multiline)
-        let mut first_line_parts = vec![
-            format!("OS: {}", std::env::consts::OS),
-        ];
+        let mut first_line_parts = vec![format!("OS: {}", std::env::consts::OS)];
 
         // Add current working directory (for path filtering context)
         if let Ok(cwd) = std::env::current_dir() {
@@ -61,7 +59,8 @@ impl Opts {
         }
 
         let first_line = first_line_parts.join(" | ");
-        let second_line = "Enter: execute | Ctrl+Y: copy | Ctrl+O: edit file | Ctrl+E: edit command";
+        let second_line =
+            "Enter: execute | Ctrl+Y: copy | Ctrl+O: edit file | Ctrl+E: edit command";
 
         let header = format!("{}\n{}", first_line, second_line);
 
