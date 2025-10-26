@@ -18,8 +18,11 @@ build-release:
     cargo build --release
 
 # Run all tests
-test:
-    ./scripts/test
+test: test-sh test-cargo
+
+# Run shell tests only
+test-sh: build
+    ./tests/run.sh
 
 # Run cargo tests only
 test-cargo:
