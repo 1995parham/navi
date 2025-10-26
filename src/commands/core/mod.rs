@@ -1,4 +1,6 @@
 mod actor;
+mod preview;
+mod suggestion;
 
 use crate::clients::{cheatsh, tldr};
 use crate::config::Source;

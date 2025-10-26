@@ -2,6 +2,7 @@ use crate::common::clipboard;
 use crate::common::fs;
 use crate::common::shell;
 use crate::common::shell::ShellSpawnError;
+use crate::common::types::{EnvVars, VariableCache};
 use crate::config::Action;
 use crate::display;
 use crate::env_var;
@@ -9,143 +10,79 @@ use crate::finder::structures::{Opts as FinderOpts, SuggestionType};
 use crate::prelude::*;
 use crate::structures::cheat::{Suggestion, VariableMap};
 use crate::structures::item::Item;
-use shell::EOF;
-use std::process::Stdio;
+
+use super::preview;
+use super::suggestion;
 
 fn prompt_finder(
     variable_name: &str,
-    suggestion: Option<&Suggestion>,
+    suggestion_option: Option<&Suggestion>,
     variable_count: usize,
-    preview_context_env_vars: &std::collections::HashMap<String, String>,
-    variable_cache: &std::collections::HashMap<String, String>,
+    preview_context_env_vars: &EnvVars,
+    variable_cache: &VariableCache,
 ) -> Result<String> {
     let mut preview_env_vars = preview_context_env_vars.clone();
-    let mut extra_preview: Option<String> = None;
 
-    let (suggestions, initial_opts) = if let Some(s) = suggestion {
-        let (suggestion_command, suggestion_opts) = s;
+    // Execute suggestion command and get options
+    let (suggestions_text, finder_opts) = if let Some((command, opts)) = suggestion_option {
+        // Apply suggestion options to preview environment variables
+        let _extra_preview = opts.as_ref()
+            .and_then(|o| suggestion::apply_suggestion_options(&mut preview_env_vars, o));
 
-        if let Some(sopts) = suggestion_opts {
-            if let Some(c) = &sopts.column {
-                preview_env_vars.insert(env_var::PREVIEW_COLUMN.to_string(), c.to_string());
-            }
-            if let Some(d) = &sopts.delimiter {
-                preview_env_vars.insert(env_var::PREVIEW_DELIMITER.to_string(), d.to_string());
-            }
-            if let Some(m) = &sopts.map {
-                preview_env_vars.insert(env_var::PREVIEW_MAP.to_string(), m.to_string());
-            }
-            if let Some(p) = &sopts.preview {
-                extra_preview = Some(p.into());
-            }
-        }
-
-        let mut cmd = shell::out();
-        cmd.stdout(Stdio::piped())
-            .arg(suggestion_command)
-            .envs(variable_cache);
-        debug!(cmd = ?cmd);
-        let child = cmd
-            .spawn()
-            .map_err(|e| ShellSpawnError::new(suggestion_command, e))?;
-
-        let text = String::from_utf8(
-            child
-                .wait_with_output()
-                .context("Failed to wait and collect output from bash")?
-                .stdout,
-        )
-        .context("Suggestions are invalid utf8")?;
-
-        (text, suggestion_opts)
+        let text = suggestion::execute_suggestion_command(command, variable_cache)?;
+        (text, opts)
     } else {
-        ('\n'.to_string(), &None)
+        ("\n".to_string(), &None)
     };
 
-    let exe = fs::exe_string();
+    // Build shell-specific preview command
+    let extra_preview = finder_opts.as_ref()
+        .and_then(|opts| opts.preview.as_ref());
+    let preview_command = preview::build_preview_command(
+        variable_name,
+        extra_preview,
+        &CONFIG.shell(),
+    );
 
-    let preview = if CONFIG.shell().contains("powershell") {
-        format!(
-            r#"{exe} preview-var {{+}} "{{q}}" "{name}"; {extra}"#,
-            exe = exe,
-            name = variable_name,
-            extra = extra_preview
-                .clone()
-                .map(|e| format!(" echo; {e}"))
-                .unwrap_or_default(),
-        )
-    } else if CONFIG.shell().contains("cmd.exe") {
-        format!(
-            r#"(@echo.{{+}}{eof}{{q}}{eof}{name}{eof}{extra}) | {exe} preview-var-stdin"#,
-            exe = exe,
-            name = variable_name,
-            extra = extra_preview.clone().unwrap_or_default(),
-            eof = EOF,
-        )
-    } else if CONFIG.shell().contains("fish") {
-        format!(
-            r#"{exe} preview-var "{{+}}" "{{q}}" "{name}"; {extra}"#,
-            exe = exe,
-            name = variable_name,
-            extra = extra_preview
-                .clone()
-                .map(|e| format!(" echo; {e}"))
-                .unwrap_or_default(),
-        )
-    } else {
-        format!(
-            r#"{exe} preview-var "$(cat <<{eof}
-{{+}}
-{eof}
-)" "$(cat <<{eof}
-{{q}}
-{eof}
-)" "{name}"; {extra}"#,
-            exe = exe,
-            name = variable_name,
-            extra = extra_preview
-                .clone()
-                .map(|e| format!(" echo; {e}"))
-                .unwrap_or_default(),
-            eof = EOF,
-        )
-    };
-
+    // Build finder options
     let mut opts = FinderOpts {
-        preview: Some(preview),
+        preview: Some(preview_command),
         show_all_columns: true,
         env_vars: preview_env_vars,
-        ..initial_opts.clone().unwrap_or_else(FinderOpts::var_default)
+        ..finder_opts.clone().unwrap_or_else(FinderOpts::var_default)
     };
 
+    // Apply variable-specific query and filter
     opts.query = env_var::get(format!("{variable_name}__query")).ok();
 
-    if let Ok(f) = env_var::get(format!("{variable_name}__best")) {
-        opts.filter = Some(f);
+    if let Ok(filter) = env_var::get(format!("{variable_name}__best")) {
+        opts.filter = Some(filter);
         opts.suggestion_type = SuggestionType::SingleSelection;
     }
 
+    // Set preview window layout
     if opts.preview_window.is_none() {
-        opts.preview_window = Some(if extra_preview.is_none() {
-            format!("up:{}", variable_count + 3)
-        } else {
-            "right:50%".to_string()
-        });
+        opts.preview_window = Some(preview::calculate_preview_window(
+            extra_preview,
+            variable_count,
+        ));
     }
 
-    if suggestion.is_none() {
+    // Disable suggestions if none provided
+    if suggestion_option.is_none() {
         opts.suggestion_type = SuggestionType::Disabled;
-    };
+    }
 
+    // Call finder with suggestions
     let (output, _) = CONFIG
         .finder()
         .call(opts, |stdin| {
             stdin
-                .write_all(suggestions.as_bytes())
+                .write_all(suggestions_text.as_bytes())
                 .context("Could not write to finder's stdin")?;
             Ok(())
         })
-        .context("finder was unable to prompt with suggestions")?;
+        .context("Finder was unable to prompt with suggestions")?;
 
     Ok(output)
 }
@@ -160,47 +97,53 @@ fn unique_result_count(results: &[&str]) -> usize {
 fn replace_variables_from_snippet(
     snippet: &str,
     tags: &str,
-    variables: VariableMap,
-    preview_context_env_vars: &std::collections::HashMap<String, String>,
+    variable_map: VariableMap,
+    preview_context_env_vars: &EnvVars,
 ) -> Result<String> {
     let mut interpolated_snippet = String::from(snippet);
-    let mut variable_cache: std::collections::HashMap<String, String> =
-        std::collections::HashMap::new();
+    let mut variable_cache = VariableCache::new();
 
     if CONFIG.prevent_interpolation() {
         return Ok(interpolated_snippet);
     }
 
-    let variables_found: Vec<&str> = display::VAR_REGEX
+    // Find all variable references in the snippet (e.g., <variable_name>)
+    let variable_references: Vec<&str> = display::VAR_REGEX
         .find_iter(snippet)
         .map(|m| m.as_str())
         .collect();
-    let variable_count = unique_result_count(&variables_found);
+    let variable_count = unique_result_count(&variable_references);
 
-    for bracketed_variable_name in variables_found {
-        let variable_name = &bracketed_variable_name[1..bracketed_variable_name.len() - 1];
-
+    // Process each variable reference
+    for variable_ref in variable_references {
+        // Extract variable name from brackets: <name> -> name
+        let variable_name = &variable_ref[1..variable_ref.len() - 1];
         let env_variable_name = env_var::escape(variable_name);
-        let cached_value = variable_cache.get(&env_variable_name);
 
-        let value = if let Some(cached) = cached_value {
+        // Get value from cache or prompt user
+        let value = if let Some(cached) = variable_cache.get(&env_variable_name) {
+            // Use cached value if available
             cached.clone()
-        } else if let Some(suggestion) = variables.get_suggestion(tags, variable_name) {
-            let mut new_suggestion = suggestion.clone();
-            new_suggestion.0 = replace_variables_from_snippet(
-                &new_suggestion.0,
+        } else if let Some(suggestion) = variable_map.get_suggestion(tags, variable_name) {
+            // Process suggestion with nested variable replacement
+            let mut processed_suggestion = suggestion.clone();
+            processed_suggestion.0 = replace_variables_from_snippet(
+                &processed_suggestion.0,
                 tags,
-                variables.clone(),
+                variable_map.clone(),
                 preview_context_env_vars,
             )?;
+
+            // Prompt user with the processed suggestion
             prompt_finder(
                 variable_name,
-                Some(&new_suggestion),
+                Some(&processed_suggestion),
                 variable_count,
                 preview_context_env_vars,
                 &variable_cache,
             )?
         } else {
+            // No suggestion available, prompt user directly
             prompt_finder(
                 variable_name,
                 None,
@@ -210,12 +153,15 @@ fn replace_variables_from_snippet(
             )?
         };
 
+        // Cache the value for future references
         variable_cache.insert(env_variable_name, value.clone());
 
+        // Replace variable reference in snippet
         interpolated_snippet = if value.as_str() == "\n" {
-            interpolated_snippet.replacen(bracketed_variable_name, "", 1)
+            // Empty value - remove the variable reference entirely
+            interpolated_snippet.replacen(variable_ref, "", 1)
         } else {
-            interpolated_snippet.replacen(bracketed_variable_name, value.as_str(), 1)
+            interpolated_snippet.replacen(variable_ref, value.as_str(), 1)
         };
     }
 
@@ -232,7 +178,7 @@ pub fn with_absolute_path(snippet: String) -> String {
 pub fn act(
     extractions: Result<(&str, Item)>,
     files: Vec<String>,
-    variables: Option<VariableMap>,
+    variable_map: Option<VariableMap>,
 ) -> Result<()> {
     let (
         key,
@@ -245,13 +191,15 @@ pub fn act(
         },
     ) = extractions.unwrap();
 
+    // Handle file editing shortcut
     if key == "ctrl-o" {
         edit::edit_file(Path::new(&files[file_index.expect("No files found")]))
             .expect("Could not open file in external editor");
         return Ok(());
     }
 
-    let mut preview_context_env_vars = std::collections::HashMap::new();
+    // Build preview context for variable replacement
+    let mut preview_context_env_vars = EnvVars::new();
     preview_context_env_vars.insert(
         env_var::PREVIEW_INITIAL_SNIPPET.to_string(),
         snippet.clone(),
@@ -259,11 +207,12 @@ pub fn act(
     preview_context_env_vars.insert(env_var::PREVIEW_TAGS.to_string(), tags.clone());
     preview_context_env_vars.insert(env_var::PREVIEW_COMMENT.to_string(), comment.to_string());
 
+    // Process snippet: replace variables, convert paths, handle newlines
     let interpolated_snippet = {
         let mut s = replace_variables_from_snippet(
             &snippet,
             &tags,
-            variables.expect("No variables received from finder"),
+            variable_map.expect("No variables received from finder"),
             &preview_context_env_vars,
         )
         .context("Failed to replace variables from snippet")?;
