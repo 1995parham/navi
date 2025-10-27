@@ -16,6 +16,23 @@ This directory contains Vim syntax highlighting for Navi cheatsheet files (`.che
 
 ## Installation
 
+### Using LazyVim / lazy.nvim
+
+Create a new file `~/.config/nvim/lua/plugins/navi.lua`:
+
+```lua
+return {
+  "1995parham/navi",
+  lazy = true,
+  ft = { "cheat" },
+  config = function()
+    vim.opt.runtimepath:append(vim.fn.stdpath("data") .. "/lazy/navi/vim")
+  end,
+}
+```
+
+The plugin will automatically load when you open `.cheat` or `.cheat.md` files.
+
 ### Using vim-plug
 
 Add to your `.vimrc`:
