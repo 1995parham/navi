@@ -20,15 +20,6 @@ f="$(navi info config-path)"
 ${EDITOR:-nano} "$f"
 
 
-% 3rd-party
-
-# Search using tldr
-navi --tldr "<query>"
-
-# Search using cheatsh
-navi --cheatsh "<query>"
-
-
 % widget
 
 # Load shell widget

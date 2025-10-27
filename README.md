@@ -63,7 +63,6 @@ You can also:
 - [browse through featured cheatsheets](docs/usage/commands/repo/README.md#browsing-through-cheatsheet-repositories)
 - [import cheatsheets from git repositories](docs/cheatsheet/repositories/README.md#importing-cheatsheet-repositories)
 - [write your own cheatsheets](#cheatsheet-syntax) (and [share them](docs/cheatsheet/repositories/README.md#submitting-cheatsheets), if you want)
-- [use cheatsheets from other tools](docs/cheatsheet/README.md#using-cheatsheets-from-other-tools), such as [tldr](https://github.com/tldr-pages/tldr) and [cheat.sh](https://github.com/chubin/cheat.sh)
 - [auto-update repositories](docs/cheatsheet/repositories/README.md#auto-updating-repositories)
 - auto-export cheatsheets from your [TiddlyWiki](https://tiddlywiki.com/) notes using a [TiddlyWiki plugin](https://bimlas.github.io/tw5-navi-cheatsheet/)
 

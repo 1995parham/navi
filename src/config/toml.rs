@@ -79,20 +79,12 @@ pub struct Shell {
 
 #[derive(Deserialize, Debug)]
 #[serde(default)]
-#[derive(Default)]
-pub struct Client {
-    pub tealdeer: bool,
-}
-
-#[derive(Deserialize, Debug)]
-#[serde(default)]
 pub struct TomlConfig {
     pub style: Style,
     pub finder: Finder,
     pub cheats: Cheats,
     pub search: Search,
     pub shell: Shell,
-    pub client: Client,
     pub source: String, // <= The source of the current configuration
 }
 
@@ -176,7 +168,6 @@ impl Default for TomlConfig {
             cheats: Default::default(),
             search: Default::default(),
             shell: Default::default(),
-            client: Default::default(),
             source: "BUILT-IN".to_string(),
         }
     }

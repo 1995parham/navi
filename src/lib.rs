@@ -1,4 +1,3 @@
-mod clients;
 mod commands;
 mod common;
 mod config;

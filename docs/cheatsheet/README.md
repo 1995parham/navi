@@ -5,7 +5,6 @@
   * [Working with `cheatsheet repositories`](#working-with-cheatsheet-repositories)
   * [Manually adding cheatsheets to navi](#manually-adding-cheatsheets-to-navi)
   * [Choosing between queries and selection with variables](#choosing-between-queries-and-selection-with-variables)
-  * [Using cheatsheets from other tools](#using-cheatsheets-from-other-tools)
 <!-- TOC -->
 
 ## Working with `cheatsheet repositories`
@@ -42,23 +41,3 @@ Navi lets you use different methods to fill a variable value, when prompted.
 | <kbd> enter </kbd> | The selection is preferred |
 
 It means if you enter the <kbd> tab </kbd> key, navi will let you enter the value.
-
-## Using cheatsheets from other tools
-
-> [!WARNING]
-> Navi **DOESN'T SUPPORT** as of now importing cheatsheets from other tools
-> but is able to **work with** TLDR and Cheat.sh.
-
-![Demo](https://user-images.githubusercontent.com/3226564/91878474-bae27500-ec55-11ea-8b19-17876178e887.gif)
-
-You can use cheatsheets from [tldr](https://github.com/tldr-pages/tldr) by running:
-
-```sh
-navi --tldr <query>
-```
-
-You can use cheatsheets from [cheat.sh](https://github.com/chubin/cheat.sh) by running:
-
-```sh
-navi --cheatsh <query>
-```

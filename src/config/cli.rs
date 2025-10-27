@@ -27,8 +27,6 @@ use clap::{Parser, Subcommand, crate_authors, crate_version};
     navi                                         # default behavior
     navi fn welcome                              # show cheatsheets for navi itself
     navi --print                                 # doesn't execute the snippet
-    navi --tldr docker                           # search for docker cheatsheets using tldr
-    navi --cheatsh docker                        # search for docker cheatsheets using cheatsh
     navi --path '/some/dir:/other/dir'           # use .cheat files from custom paths
     navi --query git                             # filter results by \"git\"
     navi --query 'create db' --best-match        # autoselect the snippet that best matches a query
@@ -60,17 +58,9 @@ pub(super) struct ClapConfig {
     #[arg(long)]
     pub prevent_interpolation: bool,
 
-    /// Searches for cheatsheets using the tldr-pages repository
-    #[arg(long)]
-    pub tldr: Option<String>,
-
     /// [Experimental] Comma-separated list that acts as filter for tags. Parts starting with ! represent negation
     #[arg(long)]
     pub tag_rules: Option<String>,
-
-    /// Searches for cheatsheets using the cheat.sh repository
-    #[arg(long)]
-    pub cheatsh: Option<String>,
 
     /// Prepopulates the search field
     #[arg(short, long, allow_hyphen_values = true)]
@@ -124,8 +114,6 @@ pub enum Command {
 #[derive(Debug)]
 pub enum Source {
     Filesystem(Option<String>),
-    Tldr(String),
-    Cheats(String),
     Welcome,
 }
 

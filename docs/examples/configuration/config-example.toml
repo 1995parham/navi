@@ -35,9 +35,6 @@ command = "fzf"  # equivalent to the --finder option. Options: "fzf" or "skim"
 [search]
 # tags = "git,!checkout"  # equivalent to the --tag-rules option
 
-[client]
-# tealdeer = true  # enables tealdeer support for navi --tldr
-
 [shell]
 # Shell used for shell out. Possible values: bash, zsh, dash, ...
 # For Windows, use `cmd.exe` instead.

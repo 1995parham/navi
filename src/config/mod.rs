@@ -42,11 +42,7 @@ impl Config {
     }
 
     pub fn source(&self) -> Source {
-        if let Some(query) = self.clap.tldr.clone() {
-            Source::Tldr(query)
-        } else if let Some(query) = self.clap.cheatsh.clone() {
-            Source::Cheats(query)
-        } else if let Some(Command::Fn(input)) = self.cmd() {
+        if let Some(Command::Fn(input)) = self.cmd() {
             if let Func::Welcome = input.func {
                 Source::Welcome
             } else {
@@ -112,10 +108,6 @@ impl Config {
 
     pub fn delimiter_var(&self) -> Option<String> {
         self.toml.finder.delimiter_var.clone()
-    }
-
-    pub fn tealdeer(&self) -> bool {
-        self.toml.client.tealdeer
     }
 
     pub fn shell(&self) -> String {
@@ -197,11 +189,7 @@ impl Config {
             return q;
         }
         if self.best_match() {
-            match self.source() {
-                Source::Tldr(q) => Some(q),
-                Source::Cheats(q) => Some(q),
-                _ => Some(String::from("")),
-            }
+            Some(String::from(""))
         } else {
             None
         }
