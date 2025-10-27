@@ -23,14 +23,15 @@ syn match cheatExtend "^@.*$"
 syn match cheatFilterKeyword "\(; \(os\|path\|hostname\):\)\@<=.*$" contained
 syn match cheatFilter "^; \(os\|path\|hostname\):.*$" contains=cheatFilterKeyword
 
-syn match cheatVariableRef "<[a-zA-Z0-9_]\+>"
 syn match cheatVariableDelim "---" contained
 
-syn region cheatVariableDef start="^\$" end="$" contains=cheatVariable,cheatVariableDelim,cheatVariableRef,@Shell oneline
+syn region cheatVariableDef start="^\$" end="$" contains=cheatVariable,cheatVariableDelim,@Shell oneline
 
-syn region cheatCodeBlock start="^```" end="^```" contains=cheatVariableRef,@Shell
+syn region cheatCodeBlock start="^```" end="^```" contains=@Shell
 
-syn region cheatCommand start="^[^%#;$@`]" end="$" contains=cheatVariableRef,@Shell oneline
+syn region cheatCommand start="^[^%#;$@`]" end="$" contains=@Shell oneline
+
+syn match cheatVariableRef "<[a-zA-Z0-9_]\+>" containedin=ALL
 
 hi def link cheatTag Title
 hi def link cheatComment Comment
