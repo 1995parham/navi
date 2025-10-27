@@ -8,6 +8,7 @@ pub struct Item {
     pub file_index: Option<usize>,
     pub path_filter: Option<String>,
     pub os_filter: Option<String>,
+    pub hostname_filter: Option<String>,
 }
 
 impl Item {

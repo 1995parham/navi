@@ -74,6 +74,38 @@ ip addr show
 # Show network interfaces (macOS only)
 ifconfig
 
+# ============================================
+# HOSTNAME-BASED FILTERING EXAMPLES
+# ============================================
+
+% server-maintenance, production
+
+; hostname: prod-server-01
+# Restart production web server (only on prod-server-01)
+sudo systemctl restart nginx
+
+; hostname: prod-server-02
+# Restart production database (only on prod-server-02)
+sudo systemctl restart postgresql
+
+% backup, servers
+
+; hostname: backup-server, storage-server
+# Run backup script (only on backup or storage servers)
+/opt/backup/run-backup.sh
+
+% development
+
+; hostname: !prod-server-01, !prod-server-02
+# Run development commands (on all hosts except production servers)
+npm run dev
+
+% database
+
+; hostname: db-primary, db-secondary
+# Check database status (only on database servers)
+psql -c "SELECT * FROM pg_stat_activity;"
+
 % combined-filters
 
 ; path: **/projects/**
@@ -87,3 +119,9 @@ ifconfig
 ./deploy.sh <environment>
 
 $ environment: echo -e "development\nstaging\nproduction" --- --prevent-extra
+
+; path: **/production/**
+; os: linux
+; hostname: prod-server-01, prod-server-02
+# Deploy to production (only in production dirs, on Linux, on production servers)
+./deploy-production.sh --force

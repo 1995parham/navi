@@ -212,6 +212,42 @@ fn should_show_for_os(os_filter: &Option<String>) -> bool {
     }
 }
 
+fn get_current_hostname() -> String {
+    hostname::get()
+        .ok()
+        .and_then(|h| h.into_string().ok())
+        .unwrap_or_else(|| "localhost".to_string())
+}
+
+fn should_show_for_hostname(hostname_filter: &Option<String>) -> bool {
+    match hostname_filter {
+        None => true, // No filter means show on all hosts
+        Some(filter) => {
+            let current_hostname = get_current_hostname();
+
+            // Split by comma and check each hostname rule
+            for hostname_rule in filter.split(',').map(|s| s.trim()) {
+                if let Some(excluded_hostname) = hostname_rule.strip_prefix('!') {
+                    // Negation: exclude this hostname
+                    if current_hostname == excluded_hostname {
+                        return false;
+                    }
+                } else {
+                    // Positive match: include this hostname
+                    if current_hostname == hostname_rule {
+                        return true;
+                    }
+                }
+            }
+
+            // If we only had negations and didn't match any, show the item
+            // If we had positive matches and didn't match any, don't show
+            let has_positive = filter.split(',').any(|s| !s.trim().starts_with('!'));
+            !has_positive
+        }
+    }
+}
+
 fn gen_lists(tag_rules: &str) -> FilterOpts {
     let words: Vec<_> = tag_rules.split(',').collect();
 
@@ -304,6 +340,11 @@ impl<'a> Parser<'a> {
             return Ok(());
         }
 
+        // Filter by hostname
+        if !should_show_for_hostname(&item.hostname_filter) {
+            return Ok(());
+        }
+
         let write_fn = self.write_fn;
 
         self.writer
@@ -362,6 +403,10 @@ impl<'a> Parser<'a> {
             // os filter
             else if let Some(os) = line.strip_prefix("; os:") {
                 item.os_filter = Some(os.trim().into());
+            }
+            // hostname filter
+            else if let Some(hostname) = line.strip_prefix("; hostname:") {
+                item.hostname_filter = Some(hostname.trim().into());
             }
             // metacomment
             else if line.starts_with(';') {
@@ -527,5 +572,52 @@ mod tests {
         // but we can verify the function doesn't panic
         let _ = should_show_for_path(&Some("**/projects/**".to_string()));
         let _ = should_show_for_path(&Some("/home/user/*, /var/**".to_string()));
+    }
+
+    #[test]
+    fn test_hostname_filtering() {
+        let current_hostname = get_current_hostname();
+
+        // No filter - should always show
+        assert!(should_show_for_hostname(&None));
+
+        // Positive match
+        assert!(should_show_for_hostname(&Some(current_hostname.clone())));
+
+        // Different hostname - should not show
+        assert!(!should_show_for_hostname(&Some("other-host".to_string())));
+
+        // Negation - exclude current hostname
+        assert!(!should_show_for_hostname(&Some(format!(
+            "!{}",
+            current_hostname
+        ))));
+
+        // Negation - exclude different hostname (should show)
+        assert!(should_show_for_hostname(&Some(
+            "!other-host".to_string()
+        )));
+
+        // Multiple values with current hostname
+        assert!(should_show_for_hostname(&Some(format!(
+            "{}, server1, server2",
+            current_hostname
+        ))));
+
+        // Multiple values without current hostname
+        assert!(!should_show_for_hostname(&Some(
+            "server1, server2".to_string()
+        )));
+
+        // Multiple negations excluding current hostname
+        assert!(!should_show_for_hostname(&Some(format!(
+            "!{}, !other-host",
+            current_hostname
+        ))));
+
+        // Multiple negations not excluding current hostname
+        assert!(should_show_for_hostname(&Some(
+            "!server1, !server2".to_string()
+        )));
     }
 }
