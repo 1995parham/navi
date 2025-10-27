@@ -150,66 +150,51 @@ fn get_current_os() -> String {
 fn matches_path_pattern(current_dir: &str, pattern: &str) -> bool {
     let pattern = pattern.trim();
 
-    // Convert glob pattern to regex-like matching
-    // Support ** for any number of directories and * for any characters
     let pattern_regex = pattern
         .replace("**", "DOUBLE_STAR")
         .replace('*', "[^/]*")
         .replace("DOUBLE_STAR", ".*");
 
-    let re = match Regex::new(&format!("^{}$", pattern_regex)) {
-        Ok(r) => r,
-        Err(_) => return false,
+    let Ok(re) = Regex::new(&format!("^{}$", pattern_regex)) else {
+        return false;
     };
 
     re.is_match(current_dir)
 }
 
 fn should_show_for_path(path_filter: &Option<String>) -> bool {
-    match path_filter {
-        None => true, // No filter means show everywhere
-        Some(filter) => {
-            let current_dir = match env::current_dir() {
-                Ok(dir) => dir.to_string_lossy().to_string(),
-                Err(_) => return false,
-            };
+    let Some(filter) = path_filter else {
+        return true;
+    };
 
-            // Split by comma and check if any pattern matches
-            filter
-                .split(',')
-                .map(|p| p.trim())
-                .any(|pattern| matches_path_pattern(&current_dir, pattern))
-        }
-    }
+    let Ok(current_dir) = env::current_dir() else {
+        return false;
+    };
+
+    filter
+        .split(',')
+        .map(str::trim)
+        .any(|pattern| matches_path_pattern(&current_dir.to_string_lossy(), pattern))
 }
 
 fn should_show_for_os(os_filter: &Option<String>) -> bool {
-    match os_filter {
-        None => true, // No filter means show on all OSes
-        Some(filter) => {
-            let current_os = get_current_os();
+    let Some(filter) = os_filter else {
+        return true;
+    };
 
-            // Split by comma and check each OS rule
-            for os_rule in filter.split(',').map(|s| s.trim()) {
-                if let Some(excluded_os) = os_rule.strip_prefix('!') {
-                    // Negation: exclude this OS
-                    if current_os == excluded_os {
-                        return false;
-                    }
-                } else {
-                    // Positive match: include this OS
-                    if current_os == os_rule {
-                        return true;
-                    }
-                }
+    let current_os = get_current_os();
+
+    for os_rule in filter.split(',').map(str::trim) {
+        if let Some(excluded_os) = os_rule.strip_prefix('!') {
+            if current_os == excluded_os {
+                return false;
             }
-
-            // If we only had negations and didn't match any, show the item
-            // If we had positive matches and didn't match any, don't show
-            let has_positive = filter.split(',').any(|s| !s.trim().starts_with('!'));
-            !has_positive
+        } else if current_os == os_rule {
+            return true;
         }
     }
+
+    !filter.split(',').any(|s| !s.trim().starts_with('!'))
 }
 
 fn get_current_hostname() -> String {
@@ -220,32 +205,23 @@ fn get_current_hostname() -> String {
 }
 
 fn should_show_for_hostname(hostname_filter: &Option<String>) -> bool {
-    match hostname_filter {
-        None => true, // No filter means show on all hosts
-        Some(filter) => {
-            let current_hostname = get_current_hostname();
+    let Some(filter) = hostname_filter else {
+        return true;
+    };
 
-            // Split by comma and check each hostname rule
-            for hostname_rule in filter.split(',').map(|s| s.trim()) {
-                if let Some(excluded_hostname) = hostname_rule.strip_prefix('!') {
-                    // Negation: exclude this hostname
-                    if current_hostname == excluded_hostname {
-                        return false;
-                    }
-                } else {
-                    // Positive match: include this hostname
-                    if current_hostname == hostname_rule {
-                        return true;
-                    }
-                }
+    let current_hostname = get_current_hostname();
+
+    for hostname_rule in filter.split(',').map(str::trim) {
+        if let Some(excluded_hostname) = hostname_rule.strip_prefix('!') {
+            if current_hostname == excluded_hostname {
+                return false;
             }
-
-            // If we only had negations and didn't match any, show the item
-            // If we had positive matches and didn't match any, don't show
-            let has_positive = filter.split(',').any(|s| !s.trim().starts_with('!'));
-            !has_positive
+        } else if current_hostname == hostname_rule {
+            return true;
         }
     }
+
+    !filter.split(',').any(|s| !s.trim().starts_with('!'))
 }
 
 fn gen_lists(tag_rules: &str) -> FilterOpts {
@@ -594,9 +570,7 @@ mod tests {
         ))));
 
         // Negation - exclude different hostname (should show)
-        assert!(should_show_for_hostname(&Some(
-            "!other-host".to_string()
-        )));
+        assert!(should_show_for_hostname(&Some("!other-host".to_string())));
 
         // Multiple values with current hostname
         assert!(should_show_for_hostname(&Some(format!(
