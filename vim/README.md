@@ -10,9 +10,10 @@ This directory contains Vim syntax highlighting for Navi cheatsheet files (`.che
 - **Filters** (`; os:`, `; path:`, `; hostname:`) - Special highlighting
 - **Variables** (`$`) - Highlighted as identifiers
 - **Extended cheats** (`@`) - Highlighted as includes
-- **Variable references** (`<variable>`) - Highlighted as types
-- **Code blocks** (` ``` `) - Highlighted as strings
+- **Variable references** (`<variable>`) - Highlighted as types (with high priority)
+- **Code blocks** (` ``` `) - Bash syntax highlighting
 - **Variable delimiters** (`---`) - Highlighted as operators
+- **Command lines** - Full bash/shell syntax highlighting with variable references preserved
 
 ## Installation
 
@@ -91,14 +92,31 @@ Here's how a cheatsheet will look with syntax highlighting:
 
 ; os: linux
 ; path: **/projects/**
+; hostname: dev-server
 
 # Change branch
 git checkout <branch>
 
+# Find and delete merged branches
+git branch --merged | grep -v "\*" | xargs -n 1 git branch -d
+
+# Search in git history
+git log --all --grep="<search_term>" --oneline
+
 $ branch: git branch | awk '{print $NF}'
+$ search_term: echo "fix\nbug\nfeature" | tr '\n' ' '
 
 @ common, variables
 ```
+
+**Syntax features shown:**
+- Tag lines (`%`) are highlighted distinctly
+- Filter metacomments with special highlighting for filter types
+- Regular comments (`#`) use comment colors
+- Commands have full bash syntax highlighting (keywords like `git`, `grep`, `awk`, pipes `|`, etc.)
+- Variable references `<branch>` and `<search_term>` are prominently highlighted
+- Variable definitions starting with `$` show bash syntax for the command part
+- Extended cheats (`@`) are highlighted as includes
 
 ## Color Scheme
 
