@@ -1,34 +1,31 @@
 use crate::common::git;
 use crate::filesystem;
-use crate::finder::FinderChoice;
+use crate::finder;
 use crate::finder::structures::{Opts as FinderOpts, SuggestionType};
 use crate::prelude::*;
 use std::fs;
 use std::path;
 
-fn ask_if_should_import_all(finder: &FinderChoice) -> Result<bool> {
+fn ask_if_should_import_all() -> Result<bool> {
     let opts = FinderOpts {
         column: Some(1),
         header: Some("Do you want to import all files from this repo?".to_string()),
         ..Default::default()
     };
 
-    let (response, _) = finder
-        .call(opts, |stdin| {
-            stdin
-                .write_all(b"Yes\nNo")
-                .context("Unable to writer alternatives")?;
-            Ok(())
-        })
-        .context("Unable to get response")?;
+    let (response, _) = finder::call(opts, |stdin| {
+        stdin
+            .write_all(b"Yes\nNo")
+            .context("Unable to writer alternatives")?;
+        Ok(())
+    })
+    .context("Unable to get response")?;
 
     Ok(response.to_lowercase().starts_with('y'))
 }
 
 pub fn main(uri: String) -> Result<()> {
-    let finder = CONFIG.finder();
-
-    let should_import_all = ask_if_should_import_all(&finder).unwrap_or(false);
+    let should_import_all = ask_if_should_import_all().unwrap_or(false);
     let (actual_uri, user, repo) = git::meta(uri.as_str());
 
     let cheat_pathbuf = filesystem::default_cheat_pathbuf()?;
@@ -56,14 +53,13 @@ pub fn main(uri: String) -> Result<()> {
     let files = if should_import_all {
         all_files
     } else {
-        let (files, _) = finder
-            .call(opts, |stdin| {
-                stdin
-                    .write_all(all_files.as_bytes())
-                    .context("Unable to prompt cheats to import")?;
-                Ok(())
-            })
-            .context("Failed to get cheatsheet files from finder")?;
+        let (files, _) = finder::call(opts, |stdin| {
+            stdin
+                .write_all(all_files.as_bytes())
+                .context("Unable to prompt cheats to import")?;
+            Ok(())
+        })
+        .context("Failed to get cheatsheet files from finder")?;
         files
     };
 

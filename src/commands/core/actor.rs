@@ -6,6 +6,7 @@ use crate::common::types::{EnvVars, VariableCache};
 use crate::config::Action;
 use crate::display;
 use crate::env_var;
+use crate::finder;
 use crate::finder::structures::{Opts as FinderOpts, SuggestionType};
 use crate::prelude::*;
 use crate::structures::cheat::{Suggestion, VariableMap};
@@ -102,15 +103,13 @@ fn prompt_finder(
     }
 
     // Call finder with suggestions
-    let (output, _) = CONFIG
-        .finder()
-        .call(opts, |stdin| {
-            stdin
-                .write_all(suggestions_text.as_bytes())
-                .context("Could not write to finder's stdin")?;
-            Ok(())
-        })
-        .context("Finder was unable to prompt with suggestions")?;
+    let (output, _) = finder::call(opts, |stdin| {
+        stdin
+            .write_all(suggestions_text.as_bytes())
+            .context("Could not write to finder's stdin")?;
+        Ok(())
+    })
+    .context("Finder was unable to prompt with suggestions")?;
 
     Ok(output)
 }

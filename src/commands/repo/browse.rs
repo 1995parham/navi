@@ -1,4 +1,5 @@
 use crate::filesystem;
+use crate::finder;
 use crate::finder::structures::{Opts as FinderOpts, SuggestionType};
 
 use crate::common::git;
@@ -6,8 +7,6 @@ use crate::prelude::*;
 use std::fs;
 
 pub fn main() -> Result<String> {
-    let finder = CONFIG.finder();
-
     let repo_pathbuf = {
         let mut p = filesystem::tmp_pathbuf()?;
         p.push("featured");
@@ -38,14 +37,13 @@ pub fn main() -> Result<String> {
         ..Default::default()
     };
 
-    let (repo, _) = finder
-        .call(opts, |stdin| {
-            stdin
-                .write_all(repos.as_bytes())
-                .context("Unable to prompt featured repositories")?;
-            Ok(())
-        })
-        .context("Failed to get repo URL from finder")?;
+    let (repo, _) = finder::call(opts, |stdin| {
+        stdin
+            .write_all(repos.as_bytes())
+            .context("Unable to prompt featured repositories")?;
+        Ok(())
+    })
+    .context("Failed to get repo URL from finder")?;
 
     filesystem::remove_dir(&repo_pathbuf)?;
 

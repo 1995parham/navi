@@ -1,5 +1,4 @@
 use crate::filesystem::default_config_pathbuf;
-use crate::finder::FinderChoice;
 use crate::prelude::*;
 use crossterm::style::Color as TerminalColor;
 use serde::de;
@@ -41,20 +40,9 @@ pub struct Style {
 #[derive(Deserialize, Debug)]
 #[serde(default)]
 pub struct Finder {
-    #[serde(deserialize_with = "finder_deserialize")]
-    pub command: FinderChoice,
     pub overrides: Option<String>,
     pub overrides_var: Option<String>,
     pub delimiter_var: Option<String>,
-}
-
-fn finder_deserialize<'de, D>(deserializer: D) -> Result<FinderChoice, D::Error>
-where
-    D: de::Deserializer<'de>,
-{
-    let s: String = Deserialize::deserialize(deserializer)?;
-    FinderChoice::from_str(s.to_lowercase().as_str())
-        .map_err(|_| de::Error::custom(format!("Failed to deserialize finder: {s}")))
 }
 
 #[derive(Deserialize, Default, Debug)]
@@ -143,7 +131,6 @@ impl Default for Style {
 impl Default for Finder {
     fn default() -> Self {
         Self {
-            command: FinderChoice::Skim,
             overrides: None,
             overrides_var: None,
             delimiter_var: None,
