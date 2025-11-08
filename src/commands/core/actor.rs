@@ -72,15 +72,13 @@ fn prompt_finder(
     }
 
     // Call finder with suggestions
-    let (output, _) = CONFIG
-        .finder()
-        .call(opts, |stdin| {
-            stdin
-                .write_all(suggestions_text.as_bytes())
-                .context("Could not write to finder's stdin")?;
-            Ok(())
-        })
-        .context("Finder was unable to prompt with suggestions")?;
+    let (output, _) = crate::finder::call(opts, |stdin| {
+        stdin
+            .write_all(suggestions_text.as_bytes())
+            .context("Could not write to finder's stdin")?;
+        Ok(())
+    })
+    .context("Finder was unable to prompt with suggestions")?;
 
     Ok(output)
 }

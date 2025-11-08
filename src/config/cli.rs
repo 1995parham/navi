@@ -1,5 +1,4 @@
 use crate::commands;
-use crate::finder::FinderChoice;
 
 use clap::{Parser, Subcommand, crate_authors, crate_version};
 
@@ -33,7 +32,6 @@ use clap::{Parser, Subcommand, crate_authors, crate_version};
     db=my navi --query 'create db' --best-match  # same, but set the value for the <name> variable
     navi repo add <user>/<repo>                  # import cheats from a git repository
     eval \"$(navi widget zsh)\"                    # load the zsh widget
-    navi --finder 'skim'                         # set skim as finder, instead of fzf
     navi --fzf-overrides '--with-nth 1,2'        # show only the comment and tag columns
     navi --fzf-overrides '--no-select-1'         # prevent autoselection in case of single line
     navi --fzf-overrides-var '--no-select-1'     # same, but for variable selection
@@ -73,10 +71,6 @@ pub(super) struct ClapConfig {
     /// Finder overrides for variable selection
     #[arg(long, allow_hyphen_values = true)]
     pub fzf_overrides_var: Option<String>,
-
-    /// Finder application to use
-    #[arg(long, ignore_case = true)]
-    pub finder: Option<FinderChoice>,
 
     #[command(subcommand)]
     pub cmd: Option<Command>,

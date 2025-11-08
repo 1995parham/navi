@@ -17,22 +17,20 @@ pub fn init(fetcher: Box<dyn Fetcher>) -> Result<()> {
     debug!("opts = {opts:#?}");
     // let fetcher = config.fetcher();
 
-    let (raw_selection, (variables, files)) = config
-        .finder()
-        .call(opts, |writer| {
-            let mut parser = Parser::new(writer, true);
+    let (raw_selection, (variables, files)) = crate::finder::call(opts, |writer| {
+        let mut parser = Parser::new(writer, true);
 
-            let found_something = fetcher
-                .fetch(&mut parser)
-                .context("Failed to parse variables intended for finder")?;
+        let found_something = fetcher
+            .fetch(&mut parser)
+            .context("Failed to parse variables intended for finder")?;
 
-            if !found_something {
-                welcome::populate_cheatsheet(&mut parser)?;
-            }
+        if !found_something {
+            welcome::populate_cheatsheet(&mut parser)?;
+        }
 
-            Ok((Some(parser.variables), fetcher.files()))
-        })
-        .context("Failed getting selection and variables from finder")?;
+        Ok((Some(parser.variables), fetcher.files()))
+    })
+    .context("Failed getting selection and variables from finder")?;
 
     debug!(raw_selection = ?raw_selection);
     let extractions = display::terminal::read(&raw_selection, config.best_match());
