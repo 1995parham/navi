@@ -298,30 +298,17 @@ echo "<pictures_folder>/screenshots"
 
 Commands can be multiline, we call them snippets.
 
-- You can write them as follows:
+You can write them using backslash continuation:
 
-  ```sh
-  % bash, foo
+```sh
+% bash, foo
 
-  # This will output "foo\nyes"
-  echo foo
-  true \
-     && echo yes \
-     || echo no
-  ```
-
-- Or, you can place them inside Markdown code blocks, delimited by triple backticks (` ``` `):
-
-  ````sh
-  % git, code
-
-  # Change branch
-  ```sh
-  git checkout <branch>
-  ```
-
-  $ branch: git branch | awk '{print $NF}'
-  ````
+# This will output "foo\nyes"
+echo foo
+true \
+   && echo yes \
+   || echo no
+```
 
 ## Aliases
 

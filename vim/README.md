@@ -22,7 +22,6 @@ This directory contains Vim syntax highlighting for Navi cheatsheet files (`.che
 - **Variable references** - Two styles supported:
   - `<variable>` (implicit dependencies) - highlighted as types with high priority
   - `$variable` (explicit dependencies) - highlighted as types
-- **Code blocks** (` ``` `) - Full bash syntax highlighting
 - **Command lines** - Full bash/shell syntax highlighting with variable references preserved
 
 ## Installation

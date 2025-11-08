@@ -56,7 +56,6 @@ hi def link cheatMetaComment Comment
 hi def link cheatFilter Special
 hi def link cheatFilterKeyword String
 hi def link cheatExtend Include
-hi def link cheatCodeBlock String
 
 " Variable definition parts
 hi def link cheatVariableMarker Special
