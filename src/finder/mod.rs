@@ -40,6 +40,10 @@ where
         .bind(bindings)
         .exact(true);
 
+    if !finder_opts.show_all_columns {
+        options_builder.with_nth(vec!["1".to_string(), "2".to_string(), "3".to_string()]);
+    }
+
     // Configure based on suggestion type
     match finder_opts.suggestion_type {
         SuggestionType::MultipleSelections => {
@@ -111,19 +115,8 @@ where
         .map_err(|e| anyhow!("Failed to build skim options: {}", e))?;
 
     // Create item reader from input with ANSI color support enabled
-    // The delimiter must be set on the item reader for with_nth to work correctly
-    let delimiter = finder_opts.delimiter.as_deref().unwrap_or(display::terminal::DELIMITER);
-    let mut item_reader_opts_builder = SkimItemReaderOption::default()
-        .ansi(true)
-        .delimiter(delimiter);
-
-    // Control which columns to display
-    if !finder_opts.show_all_columns {
-        item_reader_opts_builder = item_reader_opts_builder
-            .with_nth(["1", "2", "3"].iter().copied());
-    }
-
-    let item_reader = SkimItemReader::new(item_reader_opts_builder);
+    let item_reader_opts = SkimItemReaderOption::default().ansi(true);
+    let item_reader = SkimItemReader::new(item_reader_opts);
     let items = item_reader.of_bufread(std::io::Cursor::new(input));
 
     // Run skim

@@ -103,7 +103,7 @@ impl TomlConfig {
 impl Default for ColorWidth {
     fn default() -> Self {
         Self {
-            color: Color(TerminalColor::AnsiValue(231)), // Bright white
+            color: Color(TerminalColor::Blue),
             width_percentage: 26,
             min_width: 20,
         }
@@ -114,20 +114,16 @@ impl Default for Style {
     fn default() -> Self {
         Self {
             tag: ColorWidth {
-                color: Color(TerminalColor::AnsiValue(82)), // Bright green
+                color: Color(TerminalColor::Cyan),
                 width_percentage: 26,
                 min_width: 20,
             },
             comment: ColorWidth {
-                color: Color(TerminalColor::AnsiValue(213)), // Bright pink/magenta
+                color: Color(TerminalColor::Blue),
                 width_percentage: 42,
                 min_width: 45,
             },
-            snippet: ColorWidth {
-                color: Color(TerminalColor::AnsiValue(51)), // Bright cyan
-                width_percentage: 0,
-                min_width: 0,
-            },
+            snippet: Default::default(),
         }
     }
 }
