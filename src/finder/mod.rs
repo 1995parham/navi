@@ -112,18 +112,15 @@ where
 
     // Create item reader from input with ANSI color support enabled
     // The delimiter must be set on the item reader for with_nth to work correctly
-    let delimiter = finder_opts
-        .delimiter
-        .as_deref()
-        .unwrap_or(display::terminal::DELIMITER);
+    let delimiter = finder_opts.delimiter.as_deref().unwrap_or(display::terminal::DELIMITER);
     let mut item_reader_opts_builder = SkimItemReaderOption::default()
         .ansi(true)
         .delimiter(delimiter);
 
     // Control which columns to display
     if !finder_opts.show_all_columns {
-        item_reader_opts_builder =
-            item_reader_opts_builder.with_nth(["1", "2", "3"].iter().copied());
+        item_reader_opts_builder = item_reader_opts_builder
+            .with_nth(["1", "2", "3"].iter().copied());
     }
 
     let item_reader = SkimItemReader::new(item_reader_opts_builder);
