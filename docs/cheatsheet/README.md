@@ -48,6 +48,6 @@ Navi provides syntax highlighting for cheatsheet files to improve the editing ex
 
 - **Vim/Neovim**: See [vim syntax highlighting guide](/vim/README.md) for installation instructions
   - Supports highlighting for tags, variables, filters, comments, and more
-  - Works with `.cheat` and `.cheat.md` file extensions
+  - Works with `.cheat` file extension
 
 Having syntax highlighting makes it easier to write and maintain cheatsheets by clearly distinguishing between different elements like variables, filters, and commands.

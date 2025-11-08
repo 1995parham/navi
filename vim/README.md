@@ -1,6 +1,6 @@
 # Vim Syntax Highlighting for Navi Cheatsheets
 
-This directory contains Vim syntax highlighting for Navi cheatsheet files (`.cheat` and `.cheat.md`).
+This directory contains Vim syntax highlighting for Navi cheatsheet files (`.cheat`).
 
 ## Features
 
@@ -42,7 +42,7 @@ return {
 }
 ```
 
-The plugin will automatically load when you open `.cheat` or `.cheat.md` files.
+The plugin will automatically load when you open `.cheat` files.
 
 ### Using vim-plug
 
@@ -91,7 +91,7 @@ cp vim/ftdetect/cheat.vim ~/.vim/ftdetect/
 
 ## Usage
 
-The syntax highlighting will automatically activate when you open files with `.cheat` or `.cheat.md` extensions.
+The syntax highlighting will automatically activate when you open files with `.cheat` extension.
 
 ## Example
 

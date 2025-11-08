@@ -4,7 +4,7 @@ This guide will help you create your first navi cheatsheet.
 
 ## What is a cheatsheet?
 
-A cheatsheet is a file with `.cheat` or `.cheat.md` extension containing commands and their descriptions.
+A cheatsheet is a file with `.cheat` extension containing commands and their descriptions.
 Cheatsheets allow you to store commonly used commands with dynamic variables that can be filled in interactively.
 
 ## Creating your first cheatsheet

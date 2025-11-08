@@ -3,7 +3,7 @@
 ## Syntax overview
 
 Cheats are described in cheatsheet files.
-A cheatsheet is a file that has a `.cheat` or `.cheat.md` extension and looks like this:
+A cheatsheet is a file that has a `.cheat` extension and looks like this:
 
 ```sh
 % git, code
