@@ -19,10 +19,10 @@ _copy() {
    fi
 }"#;
 
-    shell::out()
+    shell::out()?
         .arg(
             format!(
-                r#"{cmd} 
+                r#"{cmd}
         read -r -d '' x <<'{EOF}'
 {text}
 {EOF}

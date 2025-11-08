@@ -54,8 +54,8 @@ impl Config {
     }
 
     pub fn path(&self) -> Option<String> {
-        if self.clap.path.is_some() {
-            debug!("CLAP PATH: {}", self.clap.path.as_ref().unwrap());
+        if let Some(ref path) = self.clap.path {
+            debug!("CLAP PATH: {}", path);
         }
 
         self.clap
@@ -72,11 +72,8 @@ impl Config {
                 }
             })
             .or_else(|| {
-                if self.toml.cheats.path.is_some() {
-                    debug!(
-                        "DEPRECATED UNIQUE TOML PATH: {}",
-                        self.toml.cheats.path.as_ref().unwrap()
-                    );
+                if let Some(ref path) = self.toml.cheats.path {
+                    debug!("DEPRECATED UNIQUE TOML PATH: {}", path);
                 }
 
                 self.toml.cheats.path.clone()

@@ -187,12 +187,13 @@ pub fn act(
             file_index,
             ..
         },
-    ) = extractions.unwrap();
+    ) = extractions?;
 
     // Handle file editing shortcut
     if key == "ctrl-o" {
-        edit::edit_file(Path::new(&files[file_index.expect("No files found")]))
-            .expect("Could not open file in external editor");
+        let file_idx = file_index.ok_or_else(|| anyhow!("No file index found"))?;
+        edit::edit_file(Path::new(&files[file_idx]))
+            .context("Could not open file in external editor")?;
         return Ok(());
     }
 
@@ -207,10 +208,11 @@ pub fn act(
 
     // Process snippet: replace variables, convert paths, handle newlines
     let interpolated_snippet = {
+        let var_map = variable_map.ok_or_else(|| anyhow!("No variables received from finder"))?;
         let mut s = replace_variables_from_snippet(
             &snippet,
             &tags,
-            variable_map.expect("No variables received from finder"),
+            var_map,
             &preview_context_env_vars,
         )
         .context("Failed to replace variables from snippet")?;
@@ -258,7 +260,7 @@ pub fn act(
                 clipboard::copy(interpolated_snippet)?;
             }
             _ => {
-                let mut cmd = shell::out();
+                let mut cmd = shell::out()?;
                 cmd.arg(&interpolated_snippet[..]);
                 debug!(cmd = ?cmd);
                 cmd.spawn()

@@ -101,9 +101,12 @@ pub fn tmp_pathbuf() -> Result<PathBuf> {
 }
 
 fn interpolate_paths(paths: String) -> String {
-    let re = Regex::new(r#"\$\{?[a-zA-Z_][a-zA-Z_0-9]*"#).unwrap();
+    use std::sync::LazyLock;
+    static ENV_VAR_REGEX: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r#"\$\{?[a-zA-Z_][a-zA-Z_0-9]*"#).unwrap());
+
     let mut newtext = paths.to_string();
-    for capture in re.captures_iter(&paths) {
+    for capture in ENV_VAR_REGEX.captures_iter(&paths) {
         if let Some(c) = capture.get(0) {
             let varname = c.as_str().replace(['$', '{', '}'], "");
             if let Ok(replacement) = &env_var::get(&varname) {
@@ -142,11 +145,13 @@ impl fetcher::Fetcher for Fetcher {
             return Ok(false);
         };
 
-        let paths = paths.expect("Unable to get paths");
+        let paths = paths?;
         let interpolated_paths = interpolate_paths(paths);
         let folders = paths_from_path_param(&interpolated_paths);
 
-        let home_regex = Regex::new(r"^~").unwrap();
+        use std::sync::LazyLock;
+        static HOME_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^~").unwrap());
+        let home_regex = &*HOME_REGEX;
         let home = etcetera::home_dir().ok();
 
         // parser.filter = self.tag_rules.as_ref().map(|r| gen_lists(r.as_str()));

@@ -28,7 +28,7 @@ _navi_input | _navi_map_fn | _navi_nonewline"#
             )
         };
 
-        let output = shell::out()
+        let output = shell::out()?
             .arg(cmd.as_str())
             .stderr(Stdio::inherit())
             .output()
@@ -40,10 +40,11 @@ _navi_input | _navi_map_fn | _navi_nonewline"#
     }
 }
 
-fn get_column(text: String, column: Option<u8>, delimiter: Option<&str>) -> String {
+fn get_column(text: String, column: Option<u8>, delimiter: Option<&str>) -> Result<String> {
     if let Some(c) = column {
         let mut result = String::from("");
-        let re = regex::Regex::new(delimiter.unwrap_or(r"\s\s+")).expect("Invalid regex");
+        let re = regex::Regex::new(delimiter.unwrap_or(r"\s\s+"))
+            .context("Invalid delimiter regex pattern")?;
         for line in text.split('\n') {
             if (line).is_empty() {
                 continue;
@@ -54,9 +55,9 @@ fn get_column(text: String, column: Option<u8>, delimiter: Option<&str>) -> Stri
             }
             result.push_str(parts.next().unwrap_or(""));
         }
-        result
+        Ok(result)
     } else {
-        text
+        Ok(text)
     }
 }
 
@@ -66,7 +67,7 @@ pub fn process(
     delimiter: Option<&str>,
     map_fn: Option<String>,
 ) -> Result<String> {
-    apply_map(get_column(text, column, delimiter), map_fn)
+    apply_map(get_column(text, column, delimiter)?, map_fn)
 }
 
 pub(super) fn parse_output_single(

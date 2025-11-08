@@ -10,7 +10,7 @@ use std::io::Write;
 use std::sync::LazyLock;
 
 pub static VAR_LINE_REGEX: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"^\$\s*([^:]+):(.*)").expect("Invalid regex"));
+    LazyLock::new(|| Regex::new(r"^\$\s*([^:]+):(.*)").unwrap());
 
 fn parse_opts(text: &str) -> Result<FinderOpts> {
     let mut multi = false;
@@ -139,7 +139,7 @@ fn without_first(string: &str) -> String {
         .char_indices()
         .next()
         .and_then(|(i, _)| string.get(i + 1..))
-        .expect("Should have at least one char")
+        .unwrap_or("")
         .to_string()
 }
 

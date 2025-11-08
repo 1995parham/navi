@@ -31,7 +31,7 @@ pub fn main() -> Result<()> {
     dbg!(&x);
 
     let suggestion_command = x.0.clone();
-    let child = shell::out()
+    let child = shell::out()?
         .stdout(Stdio::piped())
         .arg(&suggestion_command)
         .spawn()

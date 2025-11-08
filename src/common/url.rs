@@ -32,7 +32,7 @@ read -r -d '' url <<'{EOF}'
 
 _open_url "$url""#,
     );
-    shell::out()
+    shell::out()?
         .arg(cmd.as_str())
         .spawn()
         .map_err(|e| ShellSpawnError::new(cmd, e))?

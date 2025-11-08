@@ -35,11 +35,14 @@ impl ShellSpawnError {
     }
 }
 
-pub fn out() -> Command {
+pub fn out() -> Result<Command> {
     let words_str = CONFIG.shell();
-    let mut words_vec = shellwords::split(&words_str).expect("empty shell command");
+    let mut words_vec = shellwords::split(&words_str)
+        .context("Failed to parse shell command")?;
     let mut words = words_vec.iter_mut();
-    let first_cmd = words.next().expect("absent shell binary");
+    let first_cmd = words
+        .next()
+        .ok_or_else(|| anyhow!("Shell command is empty"))?;
     let mut cmd = Command::new(first_cmd);
     cmd.args(words);
     let dash_c = if words_str.contains("cmd.exe") {
@@ -48,5 +51,5 @@ pub fn out() -> Command {
         "-c"
     };
     cmd.arg(dash_c);
-    cmd
+    Ok(cmd)
 }

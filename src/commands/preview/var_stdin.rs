@@ -35,7 +35,7 @@ impl Runnable for Input {
         {
             print!("");
 
-            let mut cmd = shell::out();
+            let mut cmd = shell::out()?;
             cmd.arg(extra);
             debug!(?cmd);
             cmd.spawn()

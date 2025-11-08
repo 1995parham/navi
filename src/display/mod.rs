@@ -22,9 +22,9 @@ pub const LINE_SEPARATOR: &str = constants::LINE_SEPARATOR;
 use std::sync::LazyLock;
 
 pub static NEWLINE_REGEX: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"\\\s+").expect("Invalid regex"));
+    LazyLock::new(|| Regex::new(r"\\\s+").unwrap());
 pub static VAR_REGEX: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"\\?<(\w[\w\d\-_]*)>").expect("Invalid regex"));
+    LazyLock::new(|| Regex::new(r"\\?<(\w[\w\d\-_]*)>").unwrap());
 
 pub fn with_new_lines(txt: String) -> String {
     txt.replace(LINE_SEPARATOR, "\n")

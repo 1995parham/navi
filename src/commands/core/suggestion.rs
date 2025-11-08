@@ -8,7 +8,7 @@ use std::process::Stdio;
 
 /// Execute a suggestion command and return the output
 pub fn execute_suggestion_command(command: &str, variable_cache: &VariableCache) -> Result<String> {
-    let mut cmd = shell::out();
+    let mut cmd = shell::out()?;
     cmd.stdout(Stdio::piped()).arg(command).envs(variable_cache);
 
     debug!(cmd = ?cmd);
