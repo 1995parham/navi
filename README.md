@@ -21,26 +21,6 @@ An interactive cheatsheet tool for the command-line.
 
 It uses [skim](https://github.com/lotabout/skim) as an embedded library and can be either used as a command or as a shell widget (_à la_ Ctrl-R).
 
-## Table of contents
-
-- [Installation](#installation)
-- [Usage](#usage)
-- [Cheatsheet repositories](#cheatsheet-repositories)
-- [Cheatsheet syntax](#cheatsheet-syntax)
-- [Customization](#customization)
-- [More info](#more-info)
-
-## Installation
-
-The recommended way to install **navi** is by running:
-
-```sh
-brew install navi
-```
-
-> [!NOTE]
-> For more details on how to install Navi, see [docs/installation](docs/installation/README.md)
-
 ## Usage
 
 There are multiple ways to use **navi**:
