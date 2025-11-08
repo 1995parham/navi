@@ -37,14 +37,14 @@ syn match cheatVariableMarker "^\$" contained nextgroup=cheatVariableName skipwh
 syn match cheatVariableName "[a-zA-Z0-9_]\+" contained nextgroup=cheatVariableBashCmd
 
 " fzf options after ---
-syn region cheatFzfOptions start="\s" end="$" contained keepend contains=cheatFzfOption
+syn region cheatFzfOptions start="---" end="$" contained keepend contains=cheatFzfOption
 syn match cheatFzfOption "\(--[a-zA-Z0-9-]\+\|--multi\|--header-lines\|--delimiter\|--query\|--filter\|--header\|--preview\|--preview-window\|--column\|--map\|--prevent-extra\|--fzf-overrides\|--expand\)" contained
 
 " Bash command part in variable definitions (with both $var and <var> references)
-syn region cheatVariableBashCmd start=":\s*" end="$" contained contains=@Shell,cheatVariableRef,cheatVariableRefDollar keepend
+syn region cheatVariableBashCmd start=":\s*" end="---\|$" contained contains=@Shell,cheatVariableRef,cheatVariableRefDollar keepend
 
 " Complete variable definition line
-syn region cheatVariableDef start="^\$" end="---" contains=cheatVariableMarker,cheatVariableName,cheatVariableColon,cheatVariableBashCmd keepend nextgroup=cheatFzfOptions
+syn region cheatVariableDef start="^\$" end="$" contains=cheatVariableMarker,cheatVariableName,cheatVariableColon,cheatVariableBashCmd,cheatFzfOptions oneline
 
 " Regular command lines with bash syntax
 syn region cheatCommand start="^[^%#;$@`]" end="$" contains=@Shell,cheatVariableRef oneline
