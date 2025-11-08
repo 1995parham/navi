@@ -25,12 +25,145 @@ A cheatsheet can have the following elements:
 |         Extended cheats          |  `@`   | Lines starting with this character should contain tags associated to other defined cheats. <br/> <br/> :information_source: See [#extending-cheats](#extending-cheats) for more details. |
 |       Executable commands        |  N/A   |                                                             All other non-empty lines are considered as executable commands.                                                             |
 
+## Filtering Commands
+
+Navi allows you to filter commands based on operating system, path, and hostname using metacomments.
+This is useful for creating cross-platform cheatsheets or context-specific commands.
+
+### OS-based filtering
+
+Use `; os:` metacomments to show commands only on specific operating systems:
+
+```sh
+% package-manager
+
+; os: linux
+# Update system packages (Linux only)
+sudo apt update && sudo apt upgrade
+
+; os: macos
+# Update system packages (macOS only)
+brew update && brew upgrade
+
+; os: windows
+# Update system packages (Windows only)
+winget upgrade --all
+
+; os: !windows
+# Make script executable (all OSes except Windows)
+chmod +x <script_name>
+
+$ script_name: ls *.sh *.py *.rb --- --column 1
+```
+
+**Supported values:** `linux`, `macos`, `windows`
+
+**Negation:** Use `!` prefix to exclude an OS (e.g., `; os: !windows`)
+
+### Path-based filtering
+
+Use `; path:` metacomments to show commands only when in specific directories.
+This supports glob patterns:
+
+```sh
+% git
+
+; path: **/.git/**, **/projects/**
+# Show git status (only in git repositories or project directories)
+git status
+
+% docker
+
+; path: **/docker/**, **/containers/**
+# Show docker containers (only in docker-related directories)
+docker ps -a
+```
+
+**Pattern syntax:** Supports glob patterns like `**/.git/**`, `**/projects/**`, etc.
+
+**Multiple paths:** Separate multiple path patterns with commas
+
+### Hostname-based filtering
+
+Use `; hostname:` metacomments to show commands only on specific hosts:
+
+```sh
+% server-maintenance
+
+; hostname: prod-server-01
+# Restart production web server (only on prod-server-01)
+sudo systemctl restart nginx
+
+; hostname: prod-server-02
+# Restart production database (only on prod-server-02)
+sudo systemctl restart postgresql
+
+; hostname: backup-server, storage-server
+# Run backup script (only on backup or storage servers)
+/opt/backup/run-backup.sh
+
+; hostname: !prod-server-01, !prod-server-02
+# Development commands (all hosts except production)
+npm run dev
+```
+
+**Multiple hostnames:** Separate with commas
+
+**Negation:** Use `!` prefix to exclude specific hosts
+
+### Combined filters
+
+You can combine multiple filter types for fine-grained control:
+
+```sh
+% deployment
+
+; path: **/projects/**
+; os: linux
+# Run Linux-specific project tests (only in project dirs on Linux)
+./run_linux_tests.sh
+
+; path: **/web/**
+; os: !windows
+# Deploy web app (only in web directories, not on Windows)
+./deploy.sh <environment>
+
+$ environment: echo -e "development\nstaging\nproduction" --- --prevent-extra
+
+; path: **/production/**
+; os: linux
+; hostname: prod-server-01, prod-server-02
+# Deploy to production (only in production dirs, on Linux, on production servers)
+./deploy-production.sh --force
+```
+
+All filter metacomments must be placed before the command description (`#`) they apply to.
+
 ## Variables
 
 Variables are defined with brackets inside executable commands (e.g. `<branch>`).
-Variable names should only include alphanumeric characters and `_`.
 
-You can show suggestions by using the Pre-defined variable lines (i.e. lines starting with`$`).
+### Variable naming rules
+
+Variable names **must** only include alphanumeric characters and underscores (`_`).
+
+**Valid variable names:**
+- `branch`
+- `file_name`
+- `user_id`
+- `option1`
+
+**Invalid variable names:**
+- `file-name` ❌ (contains hyphen)
+- `user-id` ❌ (contains hyphen)
+- `my-var` ❌ (contains hyphen)
+
+> [!TIP]
+> If you use vim/neovim with the [navi syntax highlighting](/vim/README.md), invalid variable names containing hyphens will be highlighted as errors to help you catch mistakes early.
+
+### Defining variable values
+
+You can show suggestions by using Pre-defined variable lines (i.e. lines starting with `$`).
 Otherwise, the user will be able to type any value for it.
 
 ### Advanced variable options
@@ -83,11 +216,11 @@ In addition, it's possible to forward the following parameters to `fzf`:
 
 ### Variable dependency
 
-Pre-Defined variables can refer other pre-defined variables in two different ways, an implicit and explicit way.
+Pre-Defined variables can refer to other pre-defined variables in two different ways: implicit and explicit.
 
 #### Implicit dependencies
 
-An implicit dependency is when you refer another variable with the same syntax used in
+An implicit dependency is when you refer to another variable with the same syntax used in
 executable commands (i.e. `<variable>`).
 
 Below is an example of using implicit dependencies to construct a path:
@@ -99,6 +232,8 @@ echo "<wallpaper_folder>"
 $ pictures_folder: echo "/my/pictures"
 $ wallpaper_folder: echo "<pictures_folder>/wallpapers"
 ```
+
+In this example, `wallpaper_folder` depends on `pictures_folder` using the `<variable>` syntax.
 
 #### Explicit dependencies
 
@@ -116,6 +251,12 @@ echo <x> <y>
 $ x: echo "hello hi" | tr ' ' '\n'
 $ y: echo "$x foo;$x bar" | tr ';' '\n'
 ```
+
+In this example, variable `y` depends on variable `x` using the `$variable` syntax.
+
+> [!NOTE]
+> Both `<variable>` and `$variable` reference styles work in variable definition commands.
+> The choice between them is a matter of preference and readability in your specific use case.
 
 ### Variable as multiple arguments
 

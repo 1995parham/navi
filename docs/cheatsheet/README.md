@@ -26,3 +26,28 @@ Navi lets you use different methods to fill a variable value, when prompted.
 | <kbd> enter </kbd> | The selection is preferred |
 
 It means if you enter the <kbd> tab </kbd> key, navi will let you enter the value.
+
+## Keyboard shortcuts
+
+When selecting commands and working with navi, these keyboard shortcuts are available:
+
+|        Keyboard key        | Action                                                       |
+| :------------------------: | :----------------------------------------------------------- |
+|     <kbd> tab </kbd>       | For variables: prefer entering a custom value                |
+|    <kbd> enter </kbd>      | For variables: prefer selecting from suggestions             |
+| <kbd> ctrl </kbd>+<kbd> e </kbd> | Open selected command in your `$EDITOR` before execution |
+| <kbd> ctrl </kbd>+<kbd> o </kbd> | Open the cheat file in your `$EDITOR`                    |
+| <kbd> ctrl </kbd>+<kbd> y </kbd> | Copy command to clipboard without executing              |
+
+> [!TIP]
+> Use <kbd>ctrl</kbd>+<kbd>e</kbd> to review and modify commands before running them. This is especially useful for complex commands with multiple variables.
+
+## Editor support
+
+Navi provides syntax highlighting for cheatsheet files to improve the editing experience:
+
+- **Vim/Neovim**: See [vim syntax highlighting guide](/vim/README.md) for installation instructions
+  - Supports highlighting for tags, variables, filters, comments, and more
+  - Works with `.cheat` and `.cheat.md` file extensions
+
+Having syntax highlighting makes it easier to write and maintain cheatsheets by clearly distinguishing between different elements like variables, filters, and commands.
