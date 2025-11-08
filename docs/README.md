@@ -1,14 +1,24 @@
 # Navi <img src="https://raw.githubusercontent.com/1995parham/navi/main/assets/icon.png" alt="icon" height="28px"/> [![Actions Status](https://github.com/1995parham/navi/workflows/CI/badge.svg)](https://github.com/1995parham/navi/actions) ![GitHub release](https://img.shields.io/github/v/release/1995parham/navi?include_prereleases)
 
+## Table of Contents
+
+<!-- TOC -->
+* [Navi <img src="https://raw.githubusercontent.com/1995parham/navi/main/assets/icon.png" alt="icon" height="28px"/> ![Actions Status](https://github.com/1995parham/navi/workflows/CI/badge.svg) ![GitHub release](https://img.shields.io/github/v/release/1995parham/navi?include_prereleases)](#navi-img-srchttpsrawgithubusercontentcom1995parhamnavimainassetsiconpng-alticon-height28px--)
+  * [Table of Contents](#table-of-contents)
+  * [About](#about)
+  * [Navi Pros](#navi-pros)
+  * [Similar tools](#similar-tools)
+  * [Etymology](#etymology)
+<!-- TOC -->
+
 ## About
 
-Navi is an interactive cheatsheet tool for the command-line.
+Navi is an interactive cheatsheet tool for the command-line.\
 It allows you to browse through cheatsheets (that you may write yourself or download from maintainers) and execute commands.
 
 [![Demo](https://asciinema.org/a/406461.svg)](https://asciinema.org/a/406461)
 
-It uses [skim](https://github.com/lotabout/skim) as an embedded library under the hood and it can be
-either used as a command or as a shell widget (_à la_ Ctrl-R).
+It uses [skim](https://github.com/lotabout/skim) as an embedded library or [Alfred](https://www.alfredapp.com/) under the hood and it can be either used as a command or as a shell widget (_à la_ Ctrl-R).
 
 ## Navi Pros
 
