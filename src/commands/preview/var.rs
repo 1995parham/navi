@@ -2,24 +2,11 @@ use crate::display;
 use crate::env_var;
 use crate::finder;
 use crate::prelude::*;
-use base64::engine::general_purpose::STANDARD as BASE64;
-use base64::Engine;
 use clap::Args;
 use crossterm::style::Stylize;
 use crossterm::style::style;
-use serde::Deserialize;
 use std::iter;
 use std::process;
-
-#[derive(Debug, Clone, Deserialize)]
-struct PreviewContext {
-    snippet: String,
-    tags: String,
-    comment: String,
-    column: Option<String>,
-    delimiter: Option<String>,
-    map: Option<String>,
-}
 
 #[derive(Debug, Clone, Args)]
 pub struct Input {
@@ -29,8 +16,6 @@ pub struct Input {
     pub query: String,
     /// Typed text
     pub variable: String,
-    /// Base64-encoded preview context (snippet, tags, comment, etc.)
-    pub context: Option<String>,
 }
 
 impl Runnable for Input {
@@ -39,32 +24,12 @@ impl Runnable for Input {
         let query = &self.query;
         let variable = &self.variable;
 
-        // Decode context from base64-encoded argument or fall back to environment variables
-        let context = if let Some(ref encoded) = self.context {
-            let decoded = BASE64.decode(encoded.as_bytes())
-                .context("Failed to decode base64 context")?;
-            let json_str = String::from_utf8(decoded)
-                .context("Failed to parse context as UTF-8")?;
-            serde_json::from_str::<PreviewContext>(&json_str)
-                .context("Failed to parse context JSON")?
-        } else {
-            // Fallback to environment variables for backward compatibility
-            PreviewContext {
-                snippet: env_var::must_get(env_var::PREVIEW_INITIAL_SNIPPET),
-                tags: env_var::must_get(env_var::PREVIEW_TAGS),
-                comment: env_var::must_get(env_var::PREVIEW_COMMENT),
-                column: env_var::parse::<u8>(env_var::PREVIEW_COLUMN).map(|c| c.to_string()),
-                delimiter: env_var::get(env_var::PREVIEW_DELIMITER).ok(),
-                map: env_var::get(env_var::PREVIEW_MAP).ok(),
-            }
-        };
-
-        let snippet = context.snippet;
-        let tags = context.tags;
-        let comment = context.comment;
-        let column = context.column.as_ref().and_then(|c| c.parse::<u8>().ok());
-        let delimiter = context.delimiter;
-        let map = context.map;
+        let snippet = env_var::must_get(env_var::PREVIEW_INITIAL_SNIPPET);
+        let tags = env_var::must_get(env_var::PREVIEW_TAGS);
+        let comment = env_var::must_get(env_var::PREVIEW_COMMENT);
+        let column = env_var::parse(env_var::PREVIEW_COLUMN);
+        let delimiter = env_var::get(env_var::PREVIEW_DELIMITER).ok();
+        let map = env_var::get(env_var::PREVIEW_MAP).ok();
 
         let active_color = CONFIG.tag_color();
         let inactive_color = CONFIG.comment_color();

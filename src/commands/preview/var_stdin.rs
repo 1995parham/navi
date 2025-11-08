@@ -21,13 +21,11 @@ impl Runnable for Input {
             .expect("Unable to get variable")
             .trim()
             .to_owned();
-        let context = parts.next().map(|s| s.trim().to_owned());
 
         let input = var::Input {
             selection,
             query,
             variable,
-            context,
         };
 
         input.run()?;

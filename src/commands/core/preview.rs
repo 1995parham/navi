@@ -1,8 +1,6 @@
 /// Helper module for building shell-specific preview commands
 use crate::common::fs;
 use crate::common::shell::EOF;
-use base64::engine::general_purpose::STANDARD as BASE64;
-use base64::Engine;
 
 /// Constants for preview window layout
 mod constants {
@@ -10,49 +8,22 @@ mod constants {
     pub const EXTRA_PREVIEW_DIRECTION: &str = "right:50%";
 }
 
-/// Preview context data that needs to be passed to preview commands
-pub struct PreviewContext<'a> {
-    pub snippet: &'a str,
-    pub tags: &'a str,
-    pub comment: &'a str,
-    pub column: Option<&'a str>,
-    pub delimiter: Option<&'a str>,
-    pub map: Option<&'a str>,
-}
-
-impl<'a> PreviewContext<'a> {
-    /// Encode context as base64 for safe passing through shell
-    fn encode(&self) -> String {
-        let json = serde_json::json!({
-            "snippet": self.snippet,
-            "tags": self.tags,
-            "comment": self.comment,
-            "column": self.column,
-            "delimiter": self.delimiter,
-            "map": self.map,
-        });
-        BASE64.encode(json.to_string().as_bytes())
-    }
-}
-
 pub fn build_preview_command(
     variable_name: &str,
     extra_preview: Option<&String>,
     shell: &str,
-    context: &PreviewContext,
 ) -> String {
     let exe = fs::exe_string();
     let extra = format_extra_preview(extra_preview);
-    let context_encoded = context.encode();
 
     if shell.contains("powershell") {
-        build_powershell_preview(&exe, variable_name, &extra, &context_encoded)
+        build_powershell_preview(&exe, variable_name, &extra)
     } else if shell.contains("cmd.exe") {
-        build_cmd_preview(&exe, variable_name, extra_preview, &context_encoded)
+        build_cmd_preview(&exe, variable_name, extra_preview)
     } else if shell.contains("fish") {
-        build_fish_preview(&exe, variable_name, &extra, &context_encoded)
+        build_fish_preview(&exe, variable_name, &extra)
     } else {
-        build_unix_preview(&exe, variable_name, &extra, &context_encoded)
+        build_unix_preview(&exe, variable_name, &extra)
     }
 }
 
@@ -72,38 +43,35 @@ fn format_extra_preview(extra: Option<&String>) -> String {
     extra.map(|e| format!(" echo; {e}")).unwrap_or_default()
 }
 
-fn build_powershell_preview(exe: &str, name: &str, extra: &str, context: &str) -> String {
+fn build_powershell_preview(exe: &str, name: &str, extra: &str) -> String {
     format!(
-        r#"{exe} preview-var {{+}} "{{q}}" "{name}" "{context}"; {extra}"#,
+        r#"{exe} preview-var {{+}} "{{q}}" "{name}"; {extra}"#,
         exe = exe,
         name = name,
-        context = context,
         extra = extra,
     )
 }
 
-fn build_cmd_preview(exe: &str, name: &str, extra: Option<&String>, context: &str) -> String {
+fn build_cmd_preview(exe: &str, name: &str, extra: Option<&String>) -> String {
     format!(
-        r#"(@echo.{{+}}{eof}{{q}}{eof}{name}{eof}{context}{eof}{extra}) | {exe} preview-var-stdin"#,
+        r#"(@echo.{{+}}{eof}{{q}}{eof}{name}{eof}{extra}) | {exe} preview-var-stdin"#,
         exe = exe,
         name = name,
-        context = context,
         extra = extra.cloned().unwrap_or_default(),
         eof = EOF,
     )
 }
 
-fn build_fish_preview(exe: &str, name: &str, extra: &str, context: &str) -> String {
+fn build_fish_preview(exe: &str, name: &str, extra: &str) -> String {
     format!(
-        r#"{exe} preview-var "{{+}}" "{{q}}" "{name}" "{context}"; {extra}"#,
+        r#"{exe} preview-var "{{+}}" "{{q}}" "{name}"; {extra}"#,
         exe = exe,
         name = name,
-        context = context,
         extra = extra,
     )
 }
 
-fn build_unix_preview(exe: &str, name: &str, extra: &str, context: &str) -> String {
+fn build_unix_preview(exe: &str, name: &str, extra: &str) -> String {
     format!(
         r#"{exe} preview-var "$(cat <<{eof}
 {{+}}
@@ -111,10 +79,9 @@ fn build_unix_preview(exe: &str, name: &str, extra: &str, context: &str) -> Stri
 )" "$(cat <<{eof}
 {{q}}
 {eof}
-)" "{name}" "{context}"; {extra}"#,
+)" "{name}"; {extra}"#,
         exe = exe,
         name = name,
-        context = context,
         extra = extra,
         eof = EOF,
     )

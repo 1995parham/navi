@@ -37,46 +37,16 @@ fn prompt_finder(
         ("\n".to_string(), &None)
     };
 
-    // Build shell-specific preview command with context data
+    // Build shell-specific preview command
     let extra_preview = finder_opts.as_ref().and_then(|opts| opts.preview.as_ref());
-
-    // Extract preview context from environment variables
-    let preview_context = preview::PreviewContext {
-        snippet: preview_env_vars
-            .get(env_var::PREVIEW_INITIAL_SNIPPET)
-            .map(|s| s.as_str())
-            .unwrap_or(""),
-        tags: preview_env_vars
-            .get(env_var::PREVIEW_TAGS)
-            .map(|s| s.as_str())
-            .unwrap_or(""),
-        comment: preview_env_vars
-            .get(env_var::PREVIEW_COMMENT)
-            .map(|s| s.as_str())
-            .unwrap_or(""),
-        column: preview_env_vars
-            .get(env_var::PREVIEW_COLUMN)
-            .map(|s| s.as_str()),
-        delimiter: preview_env_vars
-            .get(env_var::PREVIEW_DELIMITER)
-            .map(|s| s.as_str()),
-        map: preview_env_vars
-            .get(env_var::PREVIEW_MAP)
-            .map(|s| s.as_str()),
-    };
-
-    let preview_command = preview::build_preview_command(
-        variable_name,
-        extra_preview,
-        &CONFIG.shell(),
-        &preview_context,
-    );
+    let preview_command =
+        preview::build_preview_command(variable_name, extra_preview, &CONFIG.shell());
 
     // Build finder options
-    // Note: env_vars are no longer needed since preview context is passed via command-line args
     let mut opts = FinderOpts {
         preview: Some(preview_command),
         show_all_columns: true,
+        env_vars: preview_env_vars,
         ..finder_opts.clone().unwrap_or_else(FinderOpts::var_default)
     };
 
