@@ -168,7 +168,7 @@ Otherwise, the user will be able to type any value for it.
 
 ### Advanced variable options
 
-For Pre-Defined variable lines, you can use `---` to customize the behavior of skim
+For Pre-Defined variable lines, you can use `---` to customize the behavior of `fzf`
 or how the value is going to be used.
 
 Below are examples of such customization:
@@ -198,18 +198,18 @@ The supported parameters are:
 | `--column <number>`     | `<number>` is the column number to extract from the result.                               |
 | `--map <bash_code>`     | **_[EXPERIMENTAL]_** `<bash_code>` is a map function to apply to the variable value.      |
 | `--prevent-extra`       | **_[EXPERIMENTAL]_** This parameter will limit the user to select one of the suggestions. |
-| `--fzf-overrides <arg>` | **_[EXPERIMENTAL]_** `<arg>` is an arbitrary argument to override skim behaviour.         |
+| `--fzf-overrides <arg>` | **_[EXPERIMENTAL]_** `<arg>` is an arbitrary argument to override `fzf` behaviour.        |
 | `--expand`              | **_[EXPERIMENTAL]_** This parameter will convert each line into a separate argument.      |
 
-In addition, it's possible to forward the following parameters to skim:
+In addition, it's possible to forward the following parameters to `fzf`:
 
-| Parameter forwarded to skim |
-| :-------------------------- |
-| `--multi`                   |
-| `--header-lines <number>`   |
-| `--delimiter <regex>`       |
-| `--query <text>`            |
-| `--filter <text>`           |
+| Parameter forwarded to `fzf` |
+| :--------------------------- |
+| `--multi`                    |
+| `--header-lines <number>`    |
+| `--delimiter <regex>`        |
+| `--query <text>`             |
+| `--filter <text>`            |
 | `--header <text>`            |
 | `--preview <bash_code>`      |
 | `--preview-window <text>`    |

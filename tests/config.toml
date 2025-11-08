@@ -11,6 +11,9 @@ min_width = 45
 [style.snippet]
 color = "white"
 
+[finder]
+command = "fzf"
+
 [shell]
 finder_command = "bash"
 command = "env BASH_ENV=\"${NAVI_HOME}/tests/helpers.sh\" bash --norc --noprofile"

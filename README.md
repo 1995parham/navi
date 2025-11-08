@@ -19,7 +19,7 @@ An interactive cheatsheet tool for the command-line.
 - it will make you type less
 - it will teach you new one-liners
 
-It uses [skim](https://github.com/lotabout/skim) as an embedded library and can be either used as a command or as a shell widget (_à la_ Ctrl-R).
+It uses [fzf](https://github.com/junegunn/fzf) or [skim](https://github.com/lotabout/skim) under the hood and it can be either used as a command or as a shell widget (_à la_ Ctrl-R).
 
 ## Table of contents
 
@@ -89,7 +89,7 @@ You can:
 - [set custom paths for your config file and cheat sheets](docs/configuration/README.md#paths-and-environment-variables)
 - [change colors](docs/configuration/README.md#changing-colors)
 - [resize columns](docs/configuration/README.md#resizing-columns)
-- [change how search is performed](docs/configuration/README.md#overriding-skim-options)
+- [change how search is performed](docs/configuration/README.md#overriding-fzf-options)
 
 ## More info
 

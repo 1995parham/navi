@@ -41,8 +41,8 @@ echo "<mapped>"
 # empty
 echo "http://google.com?q=<query>"
 
-# List directory with interactive selection
-ls / | navi
+# fzf
+ls / | fzf
 
 # 
 echo description space

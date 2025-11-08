@@ -2,7 +2,7 @@ use crate::env_var;
 use std::collections::HashMap;
 
 /// Context information passed to preview windows via environment variables.
-/// This is used for inter-process communication between navi and skim preview windows.
+/// This is used for inter-process communication between navi and fzf preview windows.
 ///
 /// Note: This type is currently not used but provides a typed interface for future improvements.
 #[allow(dead_code)]

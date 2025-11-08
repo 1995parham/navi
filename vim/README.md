@@ -18,7 +18,7 @@ This directory contains Vim syntax highlighting for Navi cheatsheet files (`.che
     - `<variable>` (implicit dependencies) - highlighted as types
     - `$variable` (explicit dependencies) - highlighted as types
   - `---` delimiter highlighted as operator
-  - skim options after `---` highlighted with special emphasis (e.g., `--multi`, `--column`, `--map`)
+  - fzf options after `---` highlighted with special emphasis (e.g., `--multi`, `--column`, `--map`)
 - **Variable references** - Two styles supported:
   - `<variable>` (implicit dependencies) - highlighted as types with high priority
   - `$variable` (explicit dependencies) - highlighted as types
@@ -135,7 +135,7 @@ $ invalid-var: echo "test"  # This will be highlighted as ERROR
   - Variable names (`branch`, `search_term`) highlighted as identifiers
   - Bash commands with full syntax highlighting
   - `---` delimiter highlighted as operator
-  - skim options (`--column`, `--multi`, `--preview`, etc.) highlighted specially
+  - fzf options (`--column`, `--multi`, `--preview`, etc.) highlighted specially
   - Nested variable references like `<home_dir>` properly highlighted
   - **Invalid variable names with hyphens** (`invalid-var`) highlighted as errors
 - Extended cheats (`@`) are highlighted as includes
@@ -145,8 +145,8 @@ $ invalid-var: echo "test"  # This will be highlighted as ERROR
 The syntax file uses standard Vim highlight groups:
 
 - `Title` - for tags (`%`)
-- `Comment` - for comments (`#`), metacomments (`;`), and skim options region
-- `Special` - for filter lines, variable markers (`$`), and skim option flags
+- `Comment` - for comments (`#`), metacomments (`;`), and fzf options region
+- `Special` - for filter lines, variable markers (`$`), and fzf option flags
 - `String` - for filter values
 - `Identifier` - for variable names in definitions
 - `Type` - for variable references (both `<var>` and `$var` styles)

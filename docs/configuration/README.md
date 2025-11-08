@@ -53,13 +53,13 @@ paths = [
 
 ### Changing colors
 
-#### skim color scheme
+#### fzf color scheme
 
-You can change the color scheme of skim by overriding skim options.
+You can change the color scheme of `fzf` by overriding fzf options.
 
 > [!NOTE]
-> See [@skim-rs/skim](https://github.com/skim-rs/skim) and
-> [#overriding-skim-options](#overriding-skim-options) for more details.
+> See [@junegunn/fzf/wiki/Color-schemes](https://github.com/junegunn/fzf/wiki/Color-schemes) and
+> [#overriding-fzf-options](#overriding-fzf-options) for more details.
 
 #### Navi colors
 
@@ -113,20 +113,19 @@ width_percentage = <width relative to the terminal window>
 min_width = <width as number of characters>
 ```
 
-### Overriding skim options
+### Overriding fzf options
 
-You can override skim options for different cases using the configuration file or command-line arguments:
+You can override fzf options for different cases using the configuration file or command-line arguments:
 
 - During the cheats selection: use the `overrides` directive or `--fzf-overrides` CLI argument
 - During the pre-defined variable values selection: use the `overrides_var` directive or `--fzf-overrides-var` CLI argument
-
-> [!NOTE]
-> The CLI arguments still use `--fzf-overrides` naming for backward compatibility, but they configure skim options.
+- For all cases: use the `FZF_DEFAULT_OPTS` environment variable
 
 **Example - Overriding during cheats selection:**
 
 ```toml
 [finder]
+command = "fzf"
 overrides = "--height 3"
 ```
 
@@ -134,11 +133,20 @@ overrides = "--height 3"
 
 ```toml
 [finder]
+command = "fzf"
 overrides_var = "--height 3"
 ```
 
+**Example - Overriding for all cases:**
+
+You can define the FZF environment variable like this:
+
+```bash
+export FZF_DEFAULT_OPTS="--height 3"
+```
+
 > [!NOTE]
-> See [@skim-rs/skim](https://github.com/skim-rs/skim) for more details on available options.
+> See [@junegunn/fzf](https://github.com/junegunn/fzf#layout) for more details on `$FZF_DEFAULT_OPTS`.
 
 ## Defining your own delimiter
 

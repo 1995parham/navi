@@ -125,7 +125,7 @@ where
 
     // Check if user aborted
     if output.is_abort {
-        // Handle abort similar to skim exit code 130
+        // Handle abort similar to fzf exit code 130
         process::exit(130);
     }
 

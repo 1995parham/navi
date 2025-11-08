@@ -28,7 +28,7 @@ syn match cheatVariableRef "<[a-zA-Z0-9_]\+>" contained containedin=shDoubleQuot
 " $variable style (explicit dependencies)
 syn match cheatVariableRefDollar "\$[a-zA-Z0-9_]\+" contained containedin=shDerefSimple
 
-" Variable definition lines: $ variable_name: bash_command --- skim_options
+" Variable definition lines: $ variable_name: bash_command --- fzf_options
 " Error: variable names containing hyphens
 syn match cheatVariableNameError "^\$\s*[a-zA-Z0-9_]*-[a-zA-Z0-9_-]*\s*:"
 
@@ -36,15 +36,15 @@ syn match cheatVariableNameError "^\$\s*[a-zA-Z0-9_]*-[a-zA-Z0-9_-]*\s*:"
 syn match cheatVariableMarker "^\$" contained nextgroup=cheatVariableName skipwhite
 syn match cheatVariableName "[a-zA-Z0-9_]\+" contained nextgroup=cheatVariableBashCmd
 
-" skim options after ---
-syn region cheatSkimOptions start="\s" end="$" contained keepend contains=cheatSkimOption
-syn match cheatSkimOption "\(--[a-zA-Z0-9-]\+\|--multi\|--header-lines\|--delimiter\|--query\|--filter\|--header\|--preview\|--preview-window\|--column\|--map\|--prevent-extra\|--fzf-overrides\|--expand\)" contained
+" fzf options after ---
+syn region cheatFzfOptions start="\s" end="$" contained keepend contains=cheatFzfOption
+syn match cheatFzfOption "\(--[a-zA-Z0-9-]\+\|--multi\|--header-lines\|--delimiter\|--query\|--filter\|--header\|--preview\|--preview-window\|--column\|--map\|--prevent-extra\|--fzf-overrides\|--expand\)" contained
 
 " Bash command part in variable definitions (with both $var and <var> references)
 syn region cheatVariableBashCmd start=":\s*" end="$" contained contains=@Shell,cheatVariableRef,cheatVariableRefDollar keepend
 
 " Complete variable definition line
-syn region cheatVariableDef start="^\$" end="---" contains=cheatVariableMarker,cheatVariableName,cheatVariableColon,cheatVariableBashCmd keepend nextgroup=cheatSkimOptions
+syn region cheatVariableDef start="^\$" end="---" contains=cheatVariableMarker,cheatVariableName,cheatVariableColon,cheatVariableBashCmd keepend nextgroup=cheatFzfOptions
 
 " Regular command lines with bash syntax
 syn region cheatCommand start="^[^%#;$@`]" end="$" contains=@Shell,cheatVariableRef oneline
@@ -68,9 +68,9 @@ hi def link cheatVariableDef Normal
 hi def link cheatVariableRef Type
 hi def link cheatVariableRefDollar Type
 
-" skim options
+" fzf options
 hi def link cheatVariableDelim Operator
-hi def link cheatSkimOptions Comment
-hi def link cheatSkimOption Function
+hi def link cheatFzfOptions Comment
+hi def link cheatFzfOption Function
 
 let b:current_syntax = "cheat"
