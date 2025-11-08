@@ -43,8 +43,7 @@ where
         .delimiter(display::terminal::DELIMITER.to_string())
         .ansi(true)
         .bind(bindings)
-        .exact(true)
-        .select_1(!finder_opts.prevent_select1);
+        .exact(true);
 
     // Configure based on suggestion type
     match finder_opts.suggestion_type {
@@ -53,8 +52,6 @@ where
         }
         SuggestionType::Disabled => {
             options_builder.print_query(true);
-            options_builder.select_1(false);
-            options_builder.interactive(false);
         }
         SuggestionType::SnippetSelection => {
             options_builder.expect(

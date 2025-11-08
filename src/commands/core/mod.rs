@@ -16,6 +16,7 @@ pub fn init(fetcher: Box<dyn Fetcher>) -> Result<()> {
     let config = &CONFIG;
     let opts = FinderOpts::snippet_default();
     debug!("opts = {opts:#?}");
+    // let fetcher = config.fetcher();
 
     let (raw_selection, (variables, files)) = finder::call(opts, |writer| {
         let mut parser = Parser::new(writer, true);
