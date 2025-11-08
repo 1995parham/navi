@@ -31,10 +31,10 @@ It means if you enter the <kbd> tab </kbd> key, navi will let you enter the valu
 
 When selecting commands and working with navi, these keyboard shortcuts are available:
 
-|           Keyboard key           | Action                                                   |
-| :------------------------------: | :------------------------------------------------------- |
-|         <kbd> tab </kbd>         | For variables: prefer entering a custom value            |
-|        <kbd> enter </kbd>        | For variables: prefer selecting from suggestions         |
+|        Keyboard key        | Action                                                       |
+| :------------------------: | :----------------------------------------------------------- |
+|     <kbd> tab </kbd>       | For variables: prefer entering a custom value                |
+|    <kbd> enter </kbd>      | For variables: prefer selecting from suggestions             |
 | <kbd> ctrl </kbd>+<kbd> e </kbd> | Open selected command in your `$EDITOR` before execution |
 | <kbd> ctrl </kbd>+<kbd> o </kbd> | Open the cheat file in your `$EDITOR`                    |
 | <kbd> ctrl </kbd>+<kbd> y </kbd> | Copy command to clipboard without executing              |

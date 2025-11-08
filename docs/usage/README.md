@@ -2,7 +2,7 @@
 
 Navi can be used in multiple ways
 
-## Defining the cheatsheets path at runtime
+#### Defining the cheatsheets path at runtime
 
 You can define the paths to use for cheatsheets at runtime using the `--path` parameter and a colon-separated paths list
 

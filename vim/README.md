@@ -124,7 +124,6 @@ $ invalid-var: echo "test"  # This will be highlighted as ERROR
 ```
 
 **Syntax features shown:**
-
 - Tag lines (`%`) are highlighted distinctly
 - Filter metacomments with special highlighting for filter types (`os:`, `path:`, `hostname:`)
 - Regular comments (`#`) use comment colors
