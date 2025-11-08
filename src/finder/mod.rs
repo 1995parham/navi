@@ -10,6 +10,12 @@ use structures::SuggestionType;
 
 mod post;
 
+pub struct BinOptions {
+    filter: Option<String>,
+    output_ending: String,
+    print_query: bool,
+}
+
 pub fn call<F, R>(finder_opts: Opts, stdin_fn: F) -> Result<(String, R)>
 where
     F: Fn(&mut dyn Write) -> Result<R>,
@@ -140,62 +146,78 @@ where
             .with_nth(VISIBLE_COLUMNS.iter().copied()) // Display columns 1, 2, 3
             .nth(VISIBLE_COLUMNS.iter().copied()); // Search in columns 1, 2, 3
     }
-
     let item_reader = SkimItemReader::new(item_reader_opts);
-    let items = item_reader.of_bufread(std::io::Cursor::new(input));
 
     // Run skim
-    let output = Skim::run_with(&options, Some(items))
-        .ok_or_else(|| anyhow!("Skim was aborted or encountered an error"))?;
+    let text = if options.filter.is_some() {
+        let items = item_reader.of_bufread(std::io::Cursor::new(input));
 
-    // Check if user aborted
-    if output.is_abort {
-        // Handle abort similar to skim exit code 130
-        process::exit(130);
-    }
+        filter(
+            &BinOptions {
+                filter: options.filter.clone(),
+                output_ending: String::from(if options.print0 { "\0" } else { "\n" }),
+                print_query: options.print_query,
+            },
+            &options,
+            items,
+        )
+    } else if input.lines().count() == 1 && options.select_1 {
+        input
+    } else {
+        let items = item_reader.of_bufread(std::io::Cursor::new(input));
 
-    // Build output text based on suggestion type
-    let mut result_lines = Vec::new();
+        let output = Skim::run_with(&options, Some(items))
+            .ok_or_else(|| anyhow!("Skim was aborted or encountered an error"))?;
 
-    // Add query if needed
-    if matches!(
-        finder_opts.suggestion_type,
-        SuggestionType::Disabled | SuggestionType::SingleRecommendation
-    ) {
-        result_lines.push(output.query);
-    }
-
-    // Add final key for snippet selection or recommendation
-    match finder_opts.suggestion_type {
-        SuggestionType::SnippetSelection => {
-            let key_str = match output.final_key {
-                Key::Ctrl('y') => "ctrl-y",
-                Key::Ctrl('o') => "ctrl-o",
-                Key::Ctrl('e') => "ctrl-e",
-                Key::Enter => "enter",
-                _ => "enter",
-            };
-            result_lines.push(key_str.to_string());
+        // Check if user aborted
+        if output.is_abort {
+            // Handle abort similar to skim exit code 130
+            process::exit(130);
         }
-        SuggestionType::SingleRecommendation => {
-            let key_str = match output.final_key {
-                Key::Tab => "tab",
-                _ => "enter",
-            };
-            result_lines.push(key_str.to_string());
+
+        // Build output text based on suggestion type
+        let mut result_lines = Vec::new();
+
+        // Add query if needed
+        if matches!(
+            finder_opts.suggestion_type,
+            SuggestionType::Disabled | SuggestionType::SingleRecommendation
+        ) {
+            result_lines.push(output.query);
         }
-        _ => {}
-    }
 
-    // Add selected items
-    result_lines.extend(
-        output
-            .selected_items
-            .iter()
-            .map(|item| item.output().to_string()),
-    );
+        // Add final key for snippet selection or recommendation
+        match finder_opts.suggestion_type {
+            SuggestionType::SnippetSelection => {
+                let key_str = match output.final_key {
+                    Key::Ctrl('y') => "ctrl-y",
+                    Key::Ctrl('o') => "ctrl-o",
+                    Key::Ctrl('e') => "ctrl-e",
+                    Key::Enter => "enter",
+                    _ => "enter",
+                };
+                result_lines.push(key_str.to_string());
+            }
+            SuggestionType::SingleRecommendation => {
+                let key_str = match output.final_key {
+                    Key::Tab => "tab",
+                    _ => "enter",
+                };
+                result_lines.push(key_str.to_string());
+            }
+            _ => {}
+        }
 
-    let text = format!("{}\n", result_lines.join("\n"));
+        // Add selected items
+        result_lines.extend(
+            output
+                .selected_items
+                .iter()
+                .map(|item| item.output().to_string()),
+        );
+
+        format!("{}\n", result_lines.join("\n"))
+    };
 
     // Parse output using existing logic
     let parsed_output = post::parse_output_single(text, finder_opts.suggestion_type)?;
@@ -207,4 +229,36 @@ where
     )?;
 
     Ok((final_output, return_value))
+}
+
+pub fn filter(bin_option: &BinOptions, options: &SkimOptions, source: SkimItemReceiver) -> String {
+    let query = bin_option.filter.clone().unwrap_or_default();
+
+    // output query
+    if bin_option.print_query {
+        print!("{}{}", query, bin_option.output_ending);
+    }
+
+    let engine_factory: Box<dyn MatchEngineFactory> = if options.regex {
+        Box::new(RegexEngineFactory::builder())
+    } else {
+        let fuzzy_engine_factory = ExactOrFuzzyEngineFactory::builder()
+            .fuzzy_algorithm(options.algorithm)
+            .exact_mode(options.exact)
+            .build();
+        Box::new(AndOrEngineFactory::new(fuzzy_engine_factory))
+    };
+
+    let engine = engine_factory.create_engine_with_case(&query, options.case);
+
+    let results: Vec<Arc<dyn skim::SkimItem>> = source
+        .into_iter()
+        .filter_map(|item| engine.match_item(item.clone()).map(|_| item))
+        .collect();
+
+    if let Some(item) = results.first() {
+        format!("{}{}", item.output(), bin_option.output_ending)
+    } else {
+        String::new()
+    }
 }
