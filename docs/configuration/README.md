@@ -95,24 +95,6 @@ Below is an example of what to do if you'd like navi to look like the French fla
 
   ![navi-custom-colors](https://github.com/user-attachments/assets/d80352c5-d888-43e6-927d-805a8de1a7e2)
 
-### Resizing columns
-
-You can change the column width of each column of navi in the configuration file with the following syntax:
-
-```toml
-[style.tag]
-width_percentage = <width relative to the terminal window>
-min_width = <width as number of characters>
-
-[style.comment]
-width_percentage = <width relative to the terminal window>
-min_width = <width as number of characters>
-
-[style.snippet]
-width_percentage = <width relative to the terminal window>
-min_width = <width as number of characters>
-```
-
 ### Overriding fzf options
 
 You can override fzf options for different cases using the configuration file or command-line arguments:
@@ -125,7 +107,6 @@ You can override fzf options for different cases using the configuration file or
 
 ```toml
 [finder]
-command = "fzf"
 overrides = "--height 3"
 ```
 
@@ -133,7 +114,6 @@ overrides = "--height 3"
 
 ```toml
 [finder]
-command = "fzf"
 overrides_var = "--height 3"
 ```
 

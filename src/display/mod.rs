@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use unicode_width::UnicodeWidthStr;
 
 pub mod terminal;
 
@@ -36,22 +35,5 @@ pub fn fix_newlines(txt: &str) -> String {
             .to_string()
     } else {
         txt.to_string()
-    }
-}
-
-fn limit_str(text: &str, length: usize) -> String {
-    let len = UnicodeWidthStr::width(text);
-    if len <= length {
-        format!("{}{}", text, " ".repeat(length - len))
-    } else {
-        let mut new_length = length;
-        let mut actual_length = 9999;
-        let mut txt = text.to_owned();
-        while actual_length >= length {
-            txt = txt.chars().take(new_length - 1).collect::<String>();
-            actual_length = UnicodeWidthStr::width(txt.as_str());
-            new_length -= 1;
-        }
-        format!("{}…{}", txt, " ".repeat(length - actual_length - 1))
     }
 }

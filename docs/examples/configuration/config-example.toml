@@ -3,21 +3,14 @@
 
 [style.tag]
 color = "cyan"  # text color. See: https://docs.rs/crossterm/latest/crossterm/style/enum.Color.html
-width_percentage = 26  # column width relative to the terminal window
-min_width = 20  # minimum column width as number of characters
 
 [style.comment]
 color = "blue"
-width_percentage = 42
-min_width = 45
 
 [style.snippet]
 color = "white"
-width_percentage = 0
-min_width = 0
 
 [finder]
-command = "fzf"  # equivalent to the --finder option. Options: "fzf" or "skim"
 # overrides = "--tac"  # equivalent to the --fzf-overrides option
 # overrides_var = "--tac"  # equivalent to the --fzf-overrides-var option
 # delimiter_var = "\\s\\s+"  # equivalent to the --delimiter option that is used with --column option when you extract a column from the selected result for a variable

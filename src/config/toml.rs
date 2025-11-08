@@ -25,8 +25,6 @@ where
 #[serde(default)]
 pub struct ColorWidth {
     pub color: Color,
-    pub width_percentage: u16,
-    pub min_width: u16,
 }
 
 #[derive(Deserialize, Debug)]
@@ -104,8 +102,6 @@ impl Default for ColorWidth {
     fn default() -> Self {
         Self {
             color: Color(TerminalColor::Blue),
-            width_percentage: 26,
-            min_width: 20,
         }
     }
 }
@@ -115,13 +111,9 @@ impl Default for Style {
         Self {
             tag: ColorWidth {
                 color: Color(TerminalColor::Cyan),
-                width_percentage: 26,
-                min_width: 20,
             },
             comment: ColorWidth {
                 color: Color(TerminalColor::Blue),
-                width_percentage: 42,
-                min_width: 45,
             },
             snippet: Default::default(),
         }

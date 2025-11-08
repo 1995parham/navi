@@ -1,52 +1,19 @@
 use super::*;
-use crate::common::terminal;
 use crate::structures::item::Item;
 use crossterm::style::{Stylize, style};
-use std::cmp::max;
-
-pub fn get_widths() -> (usize, usize, usize) {
-    let width = terminal::width();
-    let tag_width_percentage = max(
-        CONFIG.tag_min_width(),
-        width * CONFIG.tag_width_percentage() / 100,
-    );
-    let comment_width_percentage = max(
-        CONFIG.comment_min_width(),
-        width * CONFIG.comment_width_percentage() / 100,
-    );
-    let snippet_width_percentage = max(
-        CONFIG.snippet_min_width(),
-        width * CONFIG.snippet_width_percentage() / 100,
-    );
-    (
-        usize::from(tag_width_percentage),
-        usize::from(comment_width_percentage),
-        usize::from(snippet_width_percentage),
-    )
-}
 
 pub use crate::display::constants::FIELD_SEPARATOR as DELIMITER;
 
-use std::sync::LazyLock;
-
-pub static COLUMN_WIDTHS: LazyLock<(usize, usize, usize)> = LazyLock::new(get_widths);
-
 pub fn write(item: &Item) -> String {
-    let (tag_width_percentage, comment_width_percentage, snippet_width_percentage) = *COLUMN_WIDTHS;
     format!(
-        "{tags_short}{delimiter}{comment_short}{delimiter}{snippet_short}{delimiter}{tags}{delimiter}{comment}{delimiter}{snippet}{delimiter}{file_index}{delimiter}\n",
-        tags_short = style(limit_str(&item.tags, tag_width_percentage)).with(CONFIG.tag_color()),
-        comment_short =
-            style(limit_str(&item.comment, comment_width_percentage)).with(CONFIG.comment_color()),
-        snippet_short = style(limit_str(
-            &fix_newlines(&item.snippet),
-            snippet_width_percentage
-        ))
-        .with(CONFIG.snippet_color()),
-        tags = item.tags,
-        comment = item.comment,
+        "{tags}{delimiter}{comment}{delimiter}{snippet}{delimiter}{tags_full}{delimiter}{comment_full}{delimiter}{snippet_full}{delimiter}{file_index}{delimiter}\n",
+        tags = style(&item.tags).with(CONFIG.tag_color()),
+        comment = style(&item.comment).with(CONFIG.comment_color()),
+        snippet = style(&fix_newlines(&item.snippet)).with(CONFIG.snippet_color()),
+        tags_full = item.tags,
+        comment_full = item.comment,
         delimiter = DELIMITER,
-        snippet = &item.snippet.trim_end_matches(LINE_SEPARATOR),
+        snippet_full = &item.snippet.trim_end_matches(LINE_SEPARATOR),
         file_index = item.file_index.unwrap_or(0),
     )
 }

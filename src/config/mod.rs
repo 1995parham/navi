@@ -133,30 +133,6 @@ impl Config {
         self.toml.style.snippet.color.get()
     }
 
-    pub fn tag_width_percentage(&self) -> u16 {
-        self.toml.style.tag.width_percentage
-    }
-
-    pub fn comment_width_percentage(&self) -> u16 {
-        self.toml.style.comment.width_percentage
-    }
-
-    pub fn snippet_width_percentage(&self) -> u16 {
-        self.toml.style.snippet.width_percentage
-    }
-
-    pub fn tag_min_width(&self) -> u16 {
-        self.toml.style.tag.min_width
-    }
-
-    pub fn comment_min_width(&self) -> u16 {
-        self.toml.style.comment.min_width
-    }
-
-    pub fn snippet_min_width(&self) -> u16 {
-        self.toml.style.snippet.min_width
-    }
-
     #[cfg(feature = "disable-command-execution")]
     fn print(&self) -> bool {
         true
