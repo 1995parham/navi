@@ -37,14 +37,14 @@ syn match cheatVariableMarker "^\$" contained nextgroup=cheatVariableName skipwh
 syn match cheatVariableName "[a-zA-Z0-9_]\+" contained nextgroup=cheatVariableBashCmd
 
 " skim options after ---
-syn region cheatSkimOptions start="\s" end="$" contained keepend contains=cheatSkimOption
+syn region cheatSkimOptions start="---" end="$" contained keepend contains=cheatSkimOption
 syn match cheatSkimOption "\(--[a-zA-Z0-9-]\+\|--multi\|--header-lines\|--delimiter\|--query\|--filter\|--header\|--preview\|--preview-window\|--column\|--map\|--prevent-extra\|--fzf-overrides\|--expand\)" contained
 
 " Bash command part in variable definitions (with both $var and <var> references)
-syn region cheatVariableBashCmd start=":\s*" end="$" contained contains=@Shell,cheatVariableRef,cheatVariableRefDollar keepend
+syn region cheatVariableBashCmd start=":\s*" end="---\|$" contained contains=@Shell,cheatVariableRef,cheatVariableRefDollar keepend
 
 " Complete variable definition line
-syn region cheatVariableDef start="^\$" end="---" contains=cheatVariableMarker,cheatVariableName,cheatVariableColon,cheatVariableBashCmd keepend nextgroup=cheatSkimOptions
+syn region cheatVariableDef start="^\$" end="$" contains=cheatVariableMarker,cheatVariableName,cheatVariableColon,cheatVariableBashCmd,cheatSkimOptions oneline
 
 " Regular command lines with bash syntax
 syn region cheatCommand start="^[^%#;$@`]" end="$" contains=@Shell,cheatVariableRef oneline
