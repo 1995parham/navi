@@ -120,10 +120,11 @@ where
         .ansi(true)
         .delimiter(delimiter);
 
-    // Control which columns to display
+    // Control which columns to display and search
     if !finder_opts.show_all_columns {
-        item_reader_opts_builder =
-            item_reader_opts_builder.with_nth(["1", "2", "3"].iter().copied());
+        item_reader_opts_builder = item_reader_opts_builder
+            .with_nth(["1", "2", "3"].iter().copied()) // Display columns 1, 2, 3
+            .nth(["1", "2", "3"].iter().copied()); // Search in columns 1, 2, 3
     }
 
     let item_reader = SkimItemReader::new(item_reader_opts_builder);
