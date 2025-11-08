@@ -38,12 +38,12 @@ where
     let mut options_builder = SkimOptionsBuilder::default();
     options_builder
         .height("100%".to_string())
-        .prompt("navi > ".to_string())
+        .preview(Some(String::new()))
         .preview_window("up:3:nohidden".to_string())
         .delimiter(display::terminal::DELIMITER.to_string())
-        .exact(true)
         .ansi(true)
         .bind(bindings)
+        .exact(true)
         .select_1(!finder_opts.prevent_select1);
 
     // Configure based on suggestion type
@@ -56,21 +56,16 @@ where
             options_builder.select_1(false);
         }
         SuggestionType::SnippetSelection => {
-            options_builder.bind(
-                [
-                    "ctrl-y:accept",
-                    "ctrl-o:accept",
-                    "ctrl-e:accept",
-                    "enter:accept",
-                ]
-                .map(String::from)
-                .to_vec(),
+            options_builder.expect(
+                ["ctrl-y", "ctrl-o", "ctrl-e", "enter"]
+                    .map(String::from)
+                    .to_vec(),
             );
         }
         SuggestionType::SingleRecommendation => {
             options_builder
                 .print_query(true)
-                .bind(["tab:accept", "enter:accept"].map(String::from).to_vec());
+                .expect(["tab", "enter"].map(String::from).to_vec());
         }
         _ => {}
     }
