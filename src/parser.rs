@@ -392,9 +392,7 @@ impl<'a> Parser<'a> {
                 item.comment = without_prefix(&line);
             }
             // variable
-            else if !variable_cmd.is_empty()
-                || (line.starts_with('$') && line.contains(':'))
-            {
+            else if !variable_cmd.is_empty() || (line.starts_with('$') && line.contains(':')) {
                 should_break = self.write_cmd(&item).is_err();
 
                 item.snippet = String::from("");
