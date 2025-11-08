@@ -143,7 +143,7 @@ impl Default for Style {
 impl Default for Finder {
     fn default() -> Self {
         Self {
-            command: FinderChoice::Fzf,
+            command: FinderChoice::Skim,
             overrides: None,
             overrides_var: None,
             delimiter_var: None,
