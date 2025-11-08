@@ -162,7 +162,7 @@ where
             items,
         )
     } else if input.lines().count() == 1 && options.select_1 {
-        format!("{}\n", input)
+        input
     } else {
         let items = item_reader.of_bufread(std::io::Cursor::new(input));
 
@@ -251,19 +251,12 @@ pub fn filter(bin_option: &BinOptions, options: &SkimOptions, source: SkimItemRe
 
     let engine = engine_factory.create_engine_with_case(&query, options.case);
 
-    let mut results: Vec<(Arc<dyn skim::SkimItem>, i32)> = source
+    let results: Vec<Arc<dyn skim::SkimItem>> = source
         .into_iter()
-        .filter_map(|item| {
-            engine
-                .match_item(item.clone())
-                .map(|match_result| (item, match_result.rank[0]))
-        })
+        .filter_map(|item| engine.match_item(item.clone()).map(|_| item))
         .collect();
 
-    // Sort by score in descending order (highest score first)
-    results.sort_by(|a, b| b.1.cmp(&a.1));
-
-    if let Some((item, _score)) = results.last() {
+    if let Some(item) = results.first() {
         format!("{}{}", item.output(), bin_option.output_ending)
     } else {
         String::new()
