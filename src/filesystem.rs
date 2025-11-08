@@ -245,6 +245,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(not(target_os = "macos"))]
     fn test_default_config_pathbuf() {
         let base_dirs =
             etcetera::choose_base_strategy().expect("could not determine base directories");
@@ -262,9 +263,46 @@ mod tests {
     }
 
     #[test]
+    #[cfg(target_os = "macos")]
+    fn test_default_config_pathbuf_macos() {
+        let base_dirs =
+            etcetera::base_strategy::Apple::new().expect("could not determine base directories");
+
+        let expected = {
+            let mut e = base_dirs.config_dir();
+            e.push("navi");
+            e.push("config.toml");
+            e.to_string_lossy().to_string()
+        };
+
+        let config = default_config_pathbuf().expect("could not find default config path");
+
+        assert_eq!(expected, config.to_string_lossy().to_string())
+    }
+
+    #[test]
+    #[cfg(not(target_os = "macos"))]
     fn test_default_cheat_pathbuf() {
         let base_dirs =
             etcetera::choose_base_strategy().expect("could not determine base directories");
+
+        let expected = {
+            let mut e = base_dirs.data_dir();
+            e.push("navi");
+            e.push("cheats");
+            e.to_string_lossy().to_string()
+        };
+
+        let cheats = default_cheat_pathbuf().expect("could not find default config path");
+
+        assert_eq!(expected, cheats.to_string_lossy().to_string())
+    }
+
+    #[test]
+    #[cfg(target_os = "macos")]
+    fn test_default_cheat_pathbuf_macos() {
+        let base_dirs =
+            etcetera::base_strategy::Apple::new().expect("could not determine base directories");
 
         let expected = {
             let mut e = base_dirs.data_dir();
