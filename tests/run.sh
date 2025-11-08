@@ -64,9 +64,7 @@ _navi_cheatspath() {
     grep -q "/cheats"
 }
 
-if ! command_exists fzf; then
-  export PATH="$PATH:$HOME/.fzf/bin"
-fi
+# fzf is no longer used - skim is embedded as a library
 
 cd "$NAVI_HOME"
 

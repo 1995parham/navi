@@ -17,9 +17,8 @@ width_percentage = 0
 min_width = 0
 
 [finder]
-command = "fzf"  # equivalent to the --finder option. Options: "fzf" or "skim"
-# overrides = "--tac"  # equivalent to the --fzf-overrides option
-# overrides_var = "--tac"  # equivalent to the --fzf-overrides-var option
+# overrides = "--tac"  # equivalent to the --fzf-overrides option (kept for backward compatibility, configures skim)
+# overrides_var = "--tac"  # equivalent to the --fzf-overrides-var option (kept for backward compatibility, configures skim)
 # delimiter_var = "\\s\\s+"  # equivalent to the --delimiter option that is used with --column option when you extract a column from the selected result for a variable
 
 [cheats]
@@ -40,4 +39,4 @@ command = "fzf"  # equivalent to the --finder option. Options: "fzf" or "skim"
 # For Windows, use `cmd.exe` instead.
 command = "bash"
 
-# finder_command = "bash"  # similar, but for fzf's internals
+# finder_command = "bash"  # similar, but for skim's internals

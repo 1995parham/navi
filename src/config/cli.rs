@@ -88,13 +88,13 @@ pub enum Command {
     /// Manages cheatsheet repositories
     #[cfg(not(feature = "disable-repo-management"))]
     Repo(commands::repo::Input),
-    /// Used for fzf's preview window when selecting snippets
+    /// Used for skim's preview window when selecting snippets
     #[command(hide = true)]
     Preview(commands::preview::Input),
-    /// Used for fzf's preview window when selecting variable suggestions
+    /// Used for skim's preview window when selecting variable suggestions
     #[command(hide = true)]
     PreviewVar(commands::preview::var::Input),
-    /// Used for fzf's preview window when selecting variable suggestions
+    /// Used for skim's preview window when selecting variable suggestions
     #[command(hide = true)]
     PreviewVarStdin(commands::preview::var_stdin::Input),
     /// Outputs shell widget source code

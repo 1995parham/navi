@@ -18,7 +18,7 @@ It allows you to browse through cheatsheets (that you may write yourself or down
 
 [![Demo](https://asciinema.org/a/406461.svg)](https://asciinema.org/a/406461)
 
-It uses [fzf](https://github.com/junegunn/fzf), [skim](https://github.com/lotabout/skim), or [Alfred](https://www.alfredapp.com/) under the hood and it can be either used as a command or as a shell widget (_à la_ Ctrl-R).
+It uses [skim](https://github.com/lotabout/skim) as an embedded library or [Alfred](https://www.alfredapp.com/) under the hood and it can be either used as a command or as a shell widget (_à la_ Ctrl-R).
 
 ## Navi Pros
 
