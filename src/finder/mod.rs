@@ -54,6 +54,7 @@ where
         SuggestionType::Disabled => {
             options_builder.print_query(true);
             options_builder.select_1(false);
+            options_builder.interactive(false);
         }
         SuggestionType::SnippetSelection => {
             options_builder.expect(
