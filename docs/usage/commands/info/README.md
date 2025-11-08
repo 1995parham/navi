@@ -2,10 +2,21 @@
 
 Navi exposes information about its default values or examples for you to use.
 
+<!-- TOC -->
+* [The info subcommands of navi](#the-info-subcommands-of-navi)
+  * [Commands Reference](#commands-reference)
+  * [Default configuration information](#default-configuration-information)
+    * [Default configuration path](#default-configuration-path)
+    * [Example configuration file](#example-configuration-file)
+  * [Default cheatsheets path](#default-cheatsheets-path)
+<!-- TOC -->
+
 ## Commands Reference
 
 | Command             | Description                                        |
-| ------------------- | -------------------------------------------------- |
+|---------------------|----------------------------------------------------|
+| config-path         | [DEPRECATED] Lets you see the default config path  |
+| cheats-path         | [DEPRECATED] Lets you see the default cheats path  |
 | default-config-path | Lets you see the default config path               |
 | default-cheats-path | Lets you see the default cheats path               |
 | config-example      | Lets you see an example for the configuration file |
@@ -18,7 +29,7 @@ Navi exposes information about its default values or examples for you to use.
 Navi exposes its default configuration path with:
 
 ```sh
-navi info default-config-path
+navi info config-path
 ```
 
 > [!NOTE]
@@ -47,8 +58,9 @@ navi info config-example > "$(navi info config-path)"
 Navi exposes its default cheatsheets path with:
 
 ```sh
-navi info default-cheats-path
+navi info cheats-path
 ```
 
 > [!NOTE]
 > See [/docs/configuration/](/docs/configuration/README.md#the-default-cheatsheets-path) for more details on how the cheatsheets path is defined.
+
