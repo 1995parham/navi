@@ -1,8 +1,8 @@
 /// Helper module for building shell-specific preview commands
 use crate::common::fs;
 use crate::common::shell::EOF;
-use base64::Engine;
 use base64::engine::general_purpose::STANDARD as BASE64;
+use base64::Engine;
 
 /// Constants for preview window layout
 mod constants {

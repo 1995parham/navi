@@ -2,8 +2,8 @@ use crate::display;
 use crate::env_var;
 use crate::finder;
 use crate::prelude::*;
-use base64::Engine;
 use base64::engine::general_purpose::STANDARD as BASE64;
+use base64::Engine;
 use clap::Args;
 use crossterm::style::Stylize;
 use crossterm::style::style;
@@ -41,11 +41,10 @@ impl Runnable for Input {
 
         // Decode context from base64-encoded argument or fall back to environment variables
         let context = if let Some(ref encoded) = self.context {
-            let decoded = BASE64
-                .decode(encoded.as_bytes())
+            let decoded = BASE64.decode(encoded.as_bytes())
                 .context("Failed to decode base64 context")?;
-            let json_str =
-                String::from_utf8(decoded).context("Failed to parse context as UTF-8")?;
+            let json_str = String::from_utf8(decoded)
+                .context("Failed to parse context as UTF-8")?;
             serde_json::from_str::<PreviewContext>(&json_str)
                 .context("Failed to parse context JSON")?
         } else {

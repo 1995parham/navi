@@ -2,6 +2,7 @@ mod cli;
 mod toml;
 
 use crate::commands::func::Func;
+use crate::finder::FinderChoice;
 use crate::prelude::debug;
 pub use cli::*;
 use crossterm::style::Color;
@@ -85,6 +86,10 @@ impl Config {
 
                 None
             })
+    }
+
+    pub fn finder(&self) -> FinderChoice {
+        self.clap.finder.unwrap_or(self.toml.finder.command)
     }
 
     pub fn fzf_overrides(&self) -> Option<String> {
