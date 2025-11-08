@@ -23,10 +23,10 @@ syn match cheatFilter "^; \(os\|path\|hostname\):.*$" contains=cheatFilterKeywor
 
 " Variable references in commands
 " <variable> style (implicit dependencies)
-syn match cheatVariableRef "<[a-zA-Z_][a-zA-Z_0-9]\*>" contained containedin=shDoubleQuote
+syn match cheatVariableRef "<[a-zA-Z_][a-zA-Z_0-9]*>" contained containedin=shDoubleQuote,shSingleQuote
 
 " $variable style (explicit dependencies)
-syn match cheatVariableRefDollar "\$[a-zA-Z_][a-zA-Z_0-9]\*" contained containedin=shDerefSimple
+syn match cheatVariableRefDollar "\$[a-zA-Z_][a-zA-Z_0-9]*" contained containedin=shDerefSimple
 
 " Variable marker and name
 syn match cheatVariableMarker "^\$" contained nextgroup=cheatVariableName skipwhite
