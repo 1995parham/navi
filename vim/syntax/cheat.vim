@@ -23,14 +23,10 @@ syn match cheatFilter "^; \(os\|path\|hostname\):.*$" contains=cheatFilterKeywor
 
 " Variable references in commands
 " <variable> style (implicit dependencies)
-syn match cheatVariableRef "<[a-zA-Z0-9_]\+>" contained containedin=shDoubleQuote
+syn match cheatVariableRef "<[a-zA-Z_][a-zA-Z_0-9]\*>" contained containedin=shDoubleQuote
 
 " $variable style (explicit dependencies)
-syn match cheatVariableRefDollar "\$[a-zA-Z0-9_]\+" contained containedin=shDerefSimple
-
-" Variable definition lines: $ variable_name: bash_command --- fzf_options
-" Error: variable names containing hyphens
-syn match cheatVariableNameError "^\$\s*[a-zA-Z0-9_]*-[a-zA-Z0-9_-]*\s*:"
+syn match cheatVariableRefDollar "\$[a-zA-Z_][a-zA-Z_0-9]\*" contained containedin=shDerefSimple
 
 " Variable marker and name
 syn match cheatVariableMarker "^\$" contained nextgroup=cheatVariableName skipwhite
@@ -44,6 +40,7 @@ syn match cheatFzfOption "\(--[a-zA-Z0-9-]\+\|--multi\|--header-lines\|--delimit
 syn region cheatVariableBashCmd start=":\s*" end="---\|$" contained contains=@Shell,cheatVariableRef,cheatVariableRefDollar keepend
 
 " Complete variable definition line
+" Variable definition lines: $ variable_name: bash_command --- fzf_options
 syn region cheatVariableDef start="^\$" end="$" contains=cheatVariableMarker,cheatVariableName,cheatVariableColon,cheatVariableBashCmd,cheatFzfOptions oneline
 
 " Regular command lines with bash syntax
