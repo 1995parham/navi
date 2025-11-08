@@ -37,7 +37,7 @@ pub struct Style {
     pub snippet: ColorWidth,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Default, Debug)]
 #[serde(default)]
 pub struct Finder {
     pub overrides: Option<String>,
@@ -61,8 +61,13 @@ pub struct Search {
 #[derive(Deserialize, Debug)]
 #[serde(default)]
 pub struct Shell {
+    #[serde(default = "default_shell_command")]
     pub command: String,
     pub finder_command: Option<String>,
+}
+
+fn default_shell_command() -> String {
+    "bash".to_string()
 }
 
 #[derive(Deserialize, Debug)]
@@ -83,19 +88,16 @@ impl TomlConfig {
     }
 
     pub fn get() -> Result<TomlConfig> {
-        if let Ok(p) = default_config_pathbuf() {
-            // We're getting the configuration from the default path
+        // Try to load configuration from default path
+        let config_path = default_config_pathbuf().ok().filter(|p| p.exists());
 
-            if p.exists() {
-                let mut cfg = TomlConfig::from_path(&p)?;
-                cfg.source = "DEFAULT_CONFIG_FILE".to_string();
-
-                return Ok(cfg);
-            }
+        if let Some(path) = config_path {
+            let mut cfg = TomlConfig::from_path(&path)?;
+            cfg.source = "DEFAULT_CONFIG_FILE".to_string();
+            return Ok(cfg);
         }
 
-        // As no configuration has been found, we set the TOML configuration
-        // to be its default (built-in) value.
+        // Use built-in default configuration
         Ok(TomlConfig::default())
     }
 }
@@ -132,20 +134,10 @@ impl Default for Style {
     }
 }
 
-impl Default for Finder {
-    fn default() -> Self {
-        Self {
-            overrides: None,
-            overrides_var: None,
-            delimiter_var: None,
-        }
-    }
-}
-
 impl Default for Shell {
     fn default() -> Self {
         Self {
-            command: "bash".to_string(),
+            command: default_shell_command(),
             finder_command: None,
         }
     }
