@@ -34,10 +34,10 @@ pub static COLUMN_WIDTHS: LazyLock<(usize, usize, usize)> = LazyLock::new(get_wi
 pub fn write(item: &Item) -> String {
     let (tag_width_percentage, comment_width_percentage, snippet_width_percentage) = *COLUMN_WIDTHS;
     format!(
-        "{tags_short}{delimiter}{comment_short}{delimiter}{snippet_short}{delimiter}{tags}{delimiter}{comment}{delimiter}{snippet}{delimiter}{file_index}{delimiter}\n",
-        tags_short = style(limit_str(&item.tags, tag_width_percentage)).with(CONFIG.tag_color()),
+        "{comment_short}{delimiter}{tags_short}{delimiter}{snippet_short}{delimiter}{tags}{delimiter}{comment}{delimiter}{snippet}{delimiter}{file_index}{delimiter}\n",
         comment_short =
             style(limit_str(&item.comment, comment_width_percentage)).with(CONFIG.comment_color()),
+        tags_short = style(limit_str(&item.tags, tag_width_percentage)).with(CONFIG.tag_color()),
         snippet_short = style(limit_str(
             &fix_newlines(&item.snippet),
             snippet_width_percentage

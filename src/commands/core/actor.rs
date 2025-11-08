@@ -77,7 +77,7 @@ fn prompt_finder(
     // Note: env_vars are no longer needed since preview context is passed via command-line args
     let mut opts = FinderOpts {
         preview: Some(preview_command),
-        show_all_columns: true,
+        show_all_columns: false,
         ..finder_opts.clone().unwrap_or_else(FinderOpts::var_default)
     };
 

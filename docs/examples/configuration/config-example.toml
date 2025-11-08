@@ -2,17 +2,19 @@
 # Place this file at: ~/.config/navi/config.toml (Linux/macOS) or %APPDATA%\navi\config.toml (Windows)
 
 [style.tag]
-color = "cyan"  # text color. See: https://docs.rs/crossterm/latest/crossterm/style/enum.Color.html
+# text color. See: https://docs.rs/crossterm/latest/crossterm/style/enum.Color.html
+# Use named colors (e.g., "cyan", "red") or 256-color palette with AnsiValue(N) format
+color = "AnsiValue(82)"  # Bright green (default)
 width_percentage = 26  # column width relative to the terminal window
 min_width = 20  # minimum column width as number of characters
 
 [style.comment]
-color = "blue"
+color = "AnsiValue(213)"  # Bright pink/magenta (default)
 width_percentage = 42
 min_width = 45
 
 [style.snippet]
-color = "white"
+color = "AnsiValue(51)"  # Bright cyan (default)
 width_percentage = 0
 min_width = 0
 
