@@ -209,13 +209,9 @@ pub fn act(
     // Process snippet: replace variables, convert paths, handle newlines
     let interpolated_snippet = {
         let var_map = variable_map.ok_or_else(|| anyhow!("No variables received from finder"))?;
-        let mut s = replace_variables_from_snippet(
-            &snippet,
-            &tags,
-            var_map,
-            &preview_context_env_vars,
-        )
-        .context("Failed to replace variables from snippet")?;
+        let mut s =
+            replace_variables_from_snippet(&snippet, &tags, var_map, &preview_context_env_vars)
+                .context("Failed to replace variables from snippet")?;
         s = with_absolute_path(s);
         s = display::with_new_lines(s);
         s

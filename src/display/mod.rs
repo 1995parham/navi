@@ -21,8 +21,7 @@ pub const LINE_SEPARATOR: &str = constants::LINE_SEPARATOR;
 
 use std::sync::LazyLock;
 
-pub static NEWLINE_REGEX: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"\\\s+").unwrap());
+pub static NEWLINE_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\\\s+").unwrap());
 pub static VAR_REGEX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\\?<(\w[\w\d\-_]*)>").unwrap());
 

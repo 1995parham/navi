@@ -37,8 +37,7 @@ impl ShellSpawnError {
 
 pub fn out() -> Result<Command> {
     let words_str = CONFIG.shell();
-    let mut words_vec = shellwords::split(&words_str)
-        .context("Failed to parse shell command")?;
+    let mut words_vec = shellwords::split(&words_str).context("Failed to parse shell command")?;
     let mut words = words_vec.iter_mut();
     let first_cmd = words
         .next()
