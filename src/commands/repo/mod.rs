@@ -3,7 +3,6 @@ use crate::prelude::*;
 use clap::{Args, Subcommand};
 
 pub mod add;
-pub mod browse;
 
 #[derive(Debug, Clone, Subcommand)]
 pub enum RepoCommand {
@@ -12,8 +11,6 @@ pub enum RepoCommand {
         /// A URI to a git repository containing .cheat files ("user/repo" will download cheats from github.com/user/repo)
         uri: String,
     },
-    /// Browses for featured cheatsheet repos
-    Browse,
 }
 
 #[derive(Debug, Clone, Args)]
@@ -28,12 +25,6 @@ impl Runnable for Input {
             RepoCommand::Add { uri } => {
                 add::main(uri.clone())
                     .with_context(|| format!("Failed to import cheatsheets from `{uri}`"))?;
-                commands::core::main()
-            }
-            RepoCommand::Browse => {
-                let repo = browse::main().context("Failed to browse featured cheatsheets")?;
-                add::main(repo.clone())
-                    .with_context(|| format!("Failed to import cheatsheets from `{repo}`"))?;
                 commands::core::main()
             }
         }

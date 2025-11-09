@@ -3,24 +3,14 @@
 <!-- TOC -->
 * [The repo subcommands of navi](#the-repo-subcommands-of-navi)
   * [Commands Reference](#commands-reference)
-  * [Browsing through cheatsheet repositories](#browsing-through-cheatsheet-repositories)
   * [Importing cheatsheet repositories](#importing-cheatsheet-repositories)
 <!-- TOC -->
 
 ## Commands Reference
 
-| Command | Description                                                       |
-|---------|-------------------------------------------------------------------|
-| add     | Lets you import a cheatsheet repository                           |
-| browser | Lets you browse through a curated list of cheatsheet repositories |
-
-## Browsing through cheatsheet repositories
-
-You can browse cheatsheet repositories with the following command:
-
-```sh
-navi repo browse
-```
+| Command | Description                             |
+|---------|-----------------------------------------|
+| add     | Lets you import a cheatsheet repository |
 
 ## Importing cheatsheet repositories
 

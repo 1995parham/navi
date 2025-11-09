@@ -40,7 +40,6 @@ Running **navi** for the first time will help you download and manage cheatsheet
 
 You can also:
 
-- [browse through featured cheatsheets](docs/usage/commands/repo/README.md#browsing-through-cheatsheet-repositories)
 - [import cheatsheets from git repositories](docs/cheatsheet/repositories/README.md#importing-cheatsheet-repositories)
 - [write your own cheatsheets](#cheatsheet-syntax) (and [share them](docs/cheatsheet/repositories/README.md#submitting-cheatsheets), if you want)
 - [auto-update repositories](docs/cheatsheet/repositories/README.md#auto-updating-repositories)

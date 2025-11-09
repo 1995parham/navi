@@ -3,9 +3,6 @@
 # Add a cheatsheet repository
 navi repo add <user>/<repo>
 
-# Browse for cheatsheet repos
-navi repo browse
-
 # Edit main local cheatsheets
 f="$(navi info cheats-path)/main.cheat"
 [ -f "$f" ] || navi info cheats-example > "$f"
