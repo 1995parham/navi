@@ -9,7 +9,7 @@ pub fn write(item: &Item) -> String {
         "{tags}{delimiter}{comment}{delimiter}{snippet}{delimiter}{tags_full}{delimiter}{comment_full}{delimiter}{snippet_full}{delimiter}{file_index}{delimiter}\n",
         tags = style(&item.tags).with(CONFIG.tag_color()),
         comment = style(&item.comment).with(CONFIG.comment_color()),
-        snippet = style(&item.snippet).with(CONFIG.snippet_color()),
+        snippet = style(&fix_newlines(&item.snippet)).with(CONFIG.snippet_color()),
         tags_full = item.tags,
         comment_full = item.comment,
         delimiter = DELIMITER,
