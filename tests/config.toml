@@ -1,11 +1,11 @@
 [style.tag]
-color = "cyan"
+color = "51"  # bright cyan
 
 [style.comment]
-color = "yellow"
+color = "227"  # light yellow/gold
 
 [style.snippet]
-color = "white"
+color = "118"  # bright green
 
 [finder]
 

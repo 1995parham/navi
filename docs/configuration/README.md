@@ -76,24 +76,55 @@ color = "<your color for comments>"
 color = "<your color for snippets>"
 ```
 
-Below is an example of what to do if you'd like navi to look like the French flag:
+##### Color value formats
 
-- `config.toml`:
+Navi supports multiple color formats:
 
-  ```toml
-  [style.tag]
-  color = "blue"
+1. **Named colors**: `"blue"`, `"cyan"`, `"red"`, `"white"`, `"yellow"`, etc.
+2. **256-color ANSI values** (0-255): `"51"`, `"227"`, `"118"`, etc.
+   - See the [256-color chart](https://www.ditig.com/256-colors-cheat-sheet) for available colors
+3. **RGB values**: `"rgb(255, 0, 0)"` for full RGB control
 
-  [style.comment]
-  color = "white"
+> [!NOTE]
+> See the [crossterm Color enum documentation](https://docs.rs/crossterm/latest/crossterm/style/enum.Color.html) for all supported formats.
 
-  [style.snippet]
-  color = "red"
-  ```
+##### Default color scheme
 
-- The result:
+Navi uses a vibrant color scheme optimized for dark backgrounds:
 
-  ![navi-custom-colors](https://github.com/user-attachments/assets/d80352c5-d888-43e6-927d-805a8de1a7e2)
+- **Tags**: `51` (bright cyan `#00ffff`)
+- **Comments**: `227` (light yellow/gold `#ffff5f`)
+- **Snippets**: `118` (bright green `#87ff00`)
+
+##### Examples
+
+**French flag theme using named colors:**
+
+```toml
+[style.tag]
+color = "blue"
+
+[style.comment]
+color = "white"
+
+[style.snippet]
+color = "red"
+```
+
+![navi-custom-colors](https://github.com/user-attachments/assets/d80352c5-d888-43e6-927d-805a8de1a7e2)
+
+**Pastel theme using 256-color values:**
+
+```toml
+[style.tag]
+color = "189"  # Light lavender
+
+[style.comment]
+color = "217"  # Light pink
+
+[style.snippet]
+color = "156"  # Light green
+```
 
 ### Overriding fzf options
 

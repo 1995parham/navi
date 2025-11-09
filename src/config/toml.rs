@@ -101,7 +101,7 @@ impl TomlConfig {
 impl Default for ColorWidth {
     fn default() -> Self {
         Self {
-            color: Color(TerminalColor::Blue),
+            color: Color(TerminalColor::AnsiValue(118)), // Bright green
         }
     }
 }
@@ -110,12 +110,12 @@ impl Default for Style {
     fn default() -> Self {
         Self {
             tag: ColorWidth {
-                color: Color(TerminalColor::Cyan),
+                color: Color(TerminalColor::AnsiValue(51)), // Bright cyan
             },
             comment: ColorWidth {
-                color: Color(TerminalColor::Blue),
+                color: Color(TerminalColor::AnsiValue(227)), // Light yellow/gold
             },
-            snippet: Default::default(),
+            snippet: Default::default(), // Bright green (from ColorWidth default)
         }
     }
 }

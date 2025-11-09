@@ -2,13 +2,18 @@
 # Place this file at: ~/.config/navi/config.toml (Linux/macOS) or %APPDATA%\navi\config.toml (Windows)
 
 [style.tag]
-color = "cyan"  # text color. See: https://docs.rs/crossterm/latest/crossterm/style/enum.Color.html
+# 256-color ANSI value (0-255). See: https://docs.rs/crossterm/latest/crossterm/style/enum.Color.html
+# Default: 51 (bright cyan) - optimized for dark backgrounds
+# You can also use named colors like "cyan", "blue", etc.
+color = "51"
 
 [style.comment]
-color = "blue"
+# Default: 227 (light yellow/gold)
+color = "227"
 
 [style.snippet]
-color = "white"
+# Default: 118 (bright green)
+color = "118"
 
 [finder]
 # overrides = "--tac"  # equivalent to the --fzf-overrides option

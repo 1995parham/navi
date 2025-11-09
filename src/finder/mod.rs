@@ -12,6 +12,9 @@ const MIN_FZF_VERSION_MAJOR: u32 = 0;
 const MIN_FZF_VERSION_MINOR: u32 = 23;
 const MIN_FZF_VERSION_PATCH: u32 = 1;
 
+const COLORFUL_FZF_VERSION_MAJOR: u32 = 0;
+const COLORFUL_FZF_VERSION_MINOR: u32 = 56;
+
 mod post;
 
 fn parse(out: Output, opts: Opts) -> Result<String> {
@@ -84,12 +87,16 @@ where
         "--delimiter",
         display::terminal::DELIMITER.to_string().as_str(),
         "--ansi",
-        "--style",
-        "full",
         "--bind",
         format!("ctrl-j:down,ctrl-k:up{bindings}").as_str(),
         "--exact",
     ]);
+
+    if let Some((major, minor, _)) = check_fzf_version()
+        && (major > COLORFUL_FZF_VERSION_MAJOR || minor >= COLORFUL_FZF_VERSION_MINOR)
+    {
+        command.args(["--gap", "--style", "full", "--wrap"]);
+    }
 
     if !opts.show_all_columns {
         command.args(["--with-nth", "1,2,3"]);
