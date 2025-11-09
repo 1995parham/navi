@@ -62,9 +62,26 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build
+      - name: Add rustup target
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Install cross
+        run: cargo install cross --locked
+
+      - name: Build release
+        run: cross build --release --target ${{ matrix.target }}
+
+      - name: Package release
         id: build
-        run: scripts/release ${{ matrix.target }}
+        run: |
+          cd target/${{ matrix.target }}/release/
+          if [[ "${{ matrix.target }}" == *"windows"* ]]; then
+            zip -r "navi.zip" "navi.exe"
+            echo "EXTENSION=zip" >> "$GITHUB_OUTPUT"
+          else
+            tar -czf "navi.tar.gz" "navi"
+            echo "EXTENSION=tar.gz" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Generate checksums
         run: |
