@@ -111,6 +111,40 @@ npm run dev
 
 **Negation:** Use `!` prefix to exclude specific hosts
 
+### Environment variable-based filtering
+
+Use `; env:` metacomments to show commands only when specific environment variables are set:
+
+```sh
+% aws, cli
+
+; env: AWS_PROFILE
+# List EC2 instances (only when AWS_PROFILE is set)
+aws ec2 describe-instances --profile $AWS_PROFILE
+
+; env: !AWS_PROFILE
+# Select AWS profile first (only when AWS_PROFILE is NOT set)
+export AWS_PROFILE=<profile>
+
+$ profile: aws configure list-profiles
+
+; env: AWS_PROFILE, AWS_DEFAULT_PROFILE
+# Show current AWS identity (when either profile var is set)
+aws sts get-caller-identity
+
+; env: !PROD, !PRODUCTION
+# Development: Create test resources (not in production environments)
+aws s3 mb s3://test-bucket-dev
+```
+
+**Single variable:** `; env: VAR_NAME` - show only when VAR_NAME is set
+
+**Multiple variables (OR):** `; env: VAR1, VAR2` - show when ANY of the listed variables is set
+
+**Negation:** Use `!` prefix to exclude when a variable is set (e.g., `; env: !PROD`)
+
+**Multiple negations (AND):** `; env: !VAR1, !VAR2` - show only when NONE of the listed variables is set
+
 ### Combined filters
 
 You can combine multiple filter types for fine-grained control:
@@ -135,6 +169,16 @@ $ environment: echo -e "development\nstaging\nproduction" --- --prevent-extra
 ; hostname: prod-server-01, prod-server-02
 # Deploy to production (only in production dirs, on Linux, on production servers)
 ./deploy-production.sh --force
+
+; env: AWS_PROFILE
+; path: **/infrastructure/**
+# Deploy AWS infrastructure (only when AWS_PROFILE is set and in infrastructure dirs)
+terraform apply
+
+; env: !PROD
+; os: linux
+# Run development tests (not in production, on Linux only)
+./run-dev-tests.sh
 ```
 
 All filter metacomments must be placed before the command description (`#`) they apply to.

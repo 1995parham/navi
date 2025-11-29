@@ -224,6 +224,24 @@ fn should_show_for_hostname(hostname_filter: &Option<String>) -> bool {
     !filter.split(',').any(|s| !s.trim().starts_with('!'))
 }
 
+fn should_show_for_env(env_filter: &Option<String>) -> bool {
+    let Some(filter) = env_filter else {
+        return true;
+    };
+
+    for env_rule in filter.split(',').map(str::trim) {
+        if let Some(excluded_env) = env_rule.strip_prefix('!') {
+            if env::var(excluded_env).is_ok() {
+                return false;
+            }
+        } else if env::var(env_rule).is_ok() {
+            return true;
+        }
+    }
+
+    !filter.split(',').any(|s| !s.trim().starts_with('!'))
+}
+
 fn gen_lists(tag_rules: &str) -> FilterOpts {
     let words: Vec<_> = tag_rules.split(',').collect();
 
@@ -321,6 +339,11 @@ impl<'a> Parser<'a> {
             return Ok(());
         }
 
+        // Filter by environment variable
+        if !should_show_for_env(&item.env_filter) {
+            return Ok(());
+        }
+
         let write_fn = self.write_fn;
 
         self.writer
@@ -381,6 +404,10 @@ impl<'a> Parser<'a> {
             // hostname filter
             else if let Some(hostname) = line.strip_prefix("; hostname:") {
                 item.hostname_filter = Some(hostname.trim().into());
+            }
+            // env filter
+            else if let Some(env) = line.strip_prefix("; env:") {
+                item.env_filter = Some(env.trim().into());
             }
             // metacomment
             else if line.starts_with(';') {
@@ -585,5 +612,55 @@ mod tests {
         assert!(should_show_for_hostname(&Some(
             "!server1, !server2".to_string()
         )));
+    }
+
+    #[test]
+    fn test_env_filtering() {
+        // No filter - should always show
+        assert!(should_show_for_env(&None));
+
+        // Set a test env var
+        env::set_var("NAVI_TEST_ENV_VAR", "test_value");
+
+        // Positive match - env var is set
+        assert!(should_show_for_env(&Some("NAVI_TEST_ENV_VAR".to_string())));
+
+        // Non-existent env var - should not show
+        assert!(!should_show_for_env(&Some(
+            "NAVI_NONEXISTENT_VAR".to_string()
+        )));
+
+        // Negation - exclude set env var
+        assert!(!should_show_for_env(&Some(
+            "!NAVI_TEST_ENV_VAR".to_string()
+        )));
+
+        // Negation - exclude non-existent env var (should show)
+        assert!(should_show_for_env(&Some(
+            "!NAVI_NONEXISTENT_VAR".to_string()
+        )));
+
+        // Multiple values with existing env var
+        assert!(should_show_for_env(&Some(
+            "NAVI_NONEXISTENT_VAR, NAVI_TEST_ENV_VAR".to_string()
+        )));
+
+        // Multiple values without any existing env var
+        assert!(!should_show_for_env(&Some(
+            "NAVI_NONEXISTENT_VAR1, NAVI_NONEXISTENT_VAR2".to_string()
+        )));
+
+        // Multiple negations excluding set env var
+        assert!(!should_show_for_env(&Some(
+            "!NAVI_TEST_ENV_VAR, !NAVI_NONEXISTENT_VAR".to_string()
+        )));
+
+        // Multiple negations not excluding any set env var
+        assert!(should_show_for_env(&Some(
+            "!NAVI_NONEXISTENT_VAR1, !NAVI_NONEXISTENT_VAR2".to_string()
+        )));
+
+        // Clean up
+        env::remove_var("NAVI_TEST_ENV_VAR");
     }
 }

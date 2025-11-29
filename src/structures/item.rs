@@ -9,6 +9,7 @@ pub struct Item {
     pub path_filter: Option<String>,
     pub os_filter: Option<String>,
     pub hostname_filter: Option<String>,
+    pub env_filter: Option<String>,
 }
 
 impl Item {
