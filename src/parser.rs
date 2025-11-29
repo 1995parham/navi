@@ -620,7 +620,11 @@ mod tests {
         assert!(should_show_for_env(&None));
 
         // Set a test env var
-        env::set_var("NAVI_TEST_ENV_VAR", "test_value");
+        // SAFETY: This test is run in a single-threaded context and the env var
+        // is cleaned up at the end of the test.
+        unsafe {
+            env::set_var("NAVI_TEST_ENV_VAR", "test_value");
+        }
 
         // Positive match - env var is set
         assert!(should_show_for_env(&Some("NAVI_TEST_ENV_VAR".to_string())));
@@ -661,6 +665,9 @@ mod tests {
         )));
 
         // Clean up
-        env::remove_var("NAVI_TEST_ENV_VAR");
+        // SAFETY: This is the cleanup for the test env var set above.
+        unsafe {
+            env::remove_var("NAVI_TEST_ENV_VAR");
+        }
     }
 }
