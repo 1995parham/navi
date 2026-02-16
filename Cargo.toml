@@ -34,11 +34,11 @@ thiserror = "2.0"
 edit = "0.1.5"
 remove_dir_all = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tempfile = "3.15"
+tempfile = "3.25"
 toml = "0.9"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-hostname = "0.4.0"
+hostname = "0.4.2"
 
 [target.'cfg(windows)'.dependencies]
 dunce = "1"
