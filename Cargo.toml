@@ -24,7 +24,7 @@ regex = { version = "1.12", default-features = false, features = [
   "std",
   "unicode-perl",
 ] }
-clap = { version = "4.5", features = ["derive", "cargo"] }
+clap = { version = "4.6", features = ["derive", "cargo"] }
 crossterm = "0.29.0"
 etcetera = "0.11"
 walkdir = "2.5"
@@ -34,7 +34,7 @@ thiserror = "2.0"
 edit = "0.1.5"
 remove_dir_all = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tempfile = "3.26"
+tempfile = "3.27"
 toml = "1.0"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
