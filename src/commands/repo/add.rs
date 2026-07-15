@@ -71,6 +71,9 @@ pub fn main(uri: String) -> Result<()> {
         p
     };
 
+    fs::create_dir_all(&to_folder)
+        .with_context(|| format!("Failed to create `{}`", to_folder.to_string()))?;
+
     for file in files.split('\n') {
         let from = {
             let mut p = tmp_pathbuf.clone();
@@ -85,7 +88,6 @@ pub fn main(uri: String) -> Result<()> {
             p.push(filename);
             p
         };
-        fs::create_dir_all(&to_folder).unwrap_or(());
         fs::copy(&from, &to).with_context(|| {
             format!(
                 "Failed to copy `{}` to `{}`",

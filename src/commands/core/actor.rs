@@ -26,10 +26,11 @@ fn prompt_finder(
 
     // Execute suggestion command and get options
     let (suggestions_text, finder_opts) = if let Some((command, opts)) = suggestion_option {
-        // Apply suggestion options to preview environment variables
-        let _extra_preview = opts
-            .as_ref()
-            .and_then(|o| suggestion::apply_suggestion_options(&mut preview_env_vars, o));
+        // Apply suggestion options to preview environment variables. The extra
+        // preview itself is read back from `finder_opts` below.
+        if let Some(o) = opts.as_ref() {
+            suggestion::apply_suggestion_options(&mut preview_env_vars, o);
+        }
 
         let text = suggestion::execute_suggestion_command(command, variable_cache)?;
         (text, opts)
@@ -84,10 +85,7 @@ fn prompt_finder(
 }
 
 fn unique_result_count(results: &[&str]) -> usize {
-    let mut vars = results.to_owned();
-    vars.sort_unstable();
-    vars.dedup();
-    vars.len()
+    results.iter().collect::<HashSet<_>>().len()
 }
 
 fn replace_variables_from_snippet(

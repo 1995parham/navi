@@ -96,19 +96,9 @@ pub fn exe_string() -> String {
 }
 
 pub fn create_dir(path: &Path) -> Result<()> {
-    create_dir_all(path).with_context(|| {
-        format!(
-            "Failed to create directory `{}`",
-            pathbuf_to_string(path).expect("Unable to parse {path}")
-        )
-    })
+    create_dir_all(path).with_context(|| format!("Failed to create directory `{}`", path.display()))
 }
 
 pub fn remove_dir(path: &Path) -> Result<()> {
-    remove_dir_all(path).with_context(|| {
-        format!(
-            "Failed to remove directory `{}`",
-            pathbuf_to_string(path).expect("Unable to parse {path}")
-        )
-    })
+    remove_dir_all(path).with_context(|| format!("Failed to remove directory `{}`", path.display()))
 }

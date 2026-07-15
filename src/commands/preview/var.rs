@@ -105,8 +105,10 @@ impl Runnable for Input {
                 value = if env_var::get(&env_variable_name).is_ok() {
                     value
                 } else if is_current {
+                    // A broken `--map`/`--delimiter` in a cheat file must not
+                    // panic the preview on every keystroke.
                     finder::process(value, column, delimiter.as_deref(), map.clone())
-                        .expect("Unable to process value")
+                        .context("Unable to process value")?
                 } else {
                     "".to_string()
                 }

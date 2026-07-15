@@ -26,9 +26,7 @@ pub fn execute_suggestion_command(command: &str, variable_cache: &VariableCache)
 pub fn apply_suggestion_options(
     preview_env_vars: &mut std::collections::HashMap<String, String>,
     options: &FinderOpts,
-) -> Option<String> {
-    let mut extra_preview = None;
-
+) {
     if let Some(column) = options.column {
         preview_env_vars.insert(env_var::PREVIEW_COLUMN.to_string(), column.to_string());
     }
@@ -40,10 +38,4 @@ pub fn apply_suggestion_options(
     if let Some(ref map) = options.map {
         preview_env_vars.insert(env_var::PREVIEW_MAP.to_string(), map.clone());
     }
-
-    if let Some(ref preview) = options.preview {
-        extra_preview = Some(preview.clone());
-    }
-
-    extra_preview
 }

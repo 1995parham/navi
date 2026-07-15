@@ -13,12 +13,18 @@ impl Runnable for Input {
         let mut text = String::new();
         io::stdin().read_to_string(&mut text)?;
 
+        // `split` always yields at least one part, so only the later fields can
+        // legitimately be absent. Report that instead of panicking inside the
+        // fzf preview pane, where a backtrace would be all the user sees.
         let mut parts = text.split(EOF);
-        let selection = parts.next().expect("Unable to get selection").to_owned();
-        let query = parts.next().expect("Unable to get query").to_owned();
+        let selection = parts.next().unwrap_or_default().to_owned();
+        let query = parts
+            .next()
+            .context("Preview input is missing the query field")?
+            .to_owned();
         let variable = parts
             .next()
-            .expect("Unable to get variable")
+            .context("Preview input is missing the variable field")?
             .trim()
             .to_owned();
 

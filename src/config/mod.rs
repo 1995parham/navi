@@ -19,8 +19,10 @@ pub struct Config {
 impl Config {
     pub fn new() -> Self {
         let toml = TomlConfig::get().unwrap_or_else(|e| {
-            eprintln!("Error parsing config file: {e}");
-            eprintln!("Fallbacking to default one...");
+            // `{e:?}` prints the whole chain, including the TOML parser's own
+            // message with the offending line and column.
+            eprintln!("Error parsing config file: {e:?}");
+            eprintln!("Falling back to the default one...");
             eprintln!();
             TomlConfig::default()
         });
