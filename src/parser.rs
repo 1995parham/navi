@@ -210,39 +210,60 @@ fn matches_path_pattern(current_dir: &str, pattern: &str) -> bool {
         .unwrap_or(false)
 }
 
-fn should_show_for_path(path_filter: &Option<String>) -> bool {
-    let Some(filter) = path_filter else {
+/// Evaluates a comma-separated rule list against `matches`, where a `!` prefix
+/// negates a rule.
+///
+/// An item is hidden as soon as a negated rule matches. Otherwise it is shown if
+/// a positive rule matches, or if the list contains no positive rules at all
+/// (i.e. a pure denylist such as `!windows` shows everything but Windows).
+fn should_show(filter: &Option<String>, matches: impl Fn(&str) -> bool) -> bool {
+    let Some(filter) = filter else {
         return true;
     };
+
+    let mut has_positive = false;
+
+    for rule in filter.split(',').map(str::trim).filter(|r| !r.is_empty()) {
+        match rule.strip_prefix('!') {
+            Some(negated) => {
+                if matches(negated.trim()) {
+                    return false;
+                }
+            }
+            None => {
+                has_positive = true;
+                if matches(rule) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    !has_positive
+}
+
+fn should_show_for_path(path_filter: &Option<String>) -> bool {
+    if path_filter.is_none() {
+        return true;
+    }
 
     let Ok(current_dir) = env::current_dir() else {
         return false;
     };
+    let current_dir = current_dir.to_string_lossy();
 
-    filter
-        .split(',')
-        .map(str::trim)
-        .any(|pattern| matches_path_pattern(&current_dir.to_string_lossy(), pattern))
+    should_show(path_filter, |pattern| {
+        matches_path_pattern(&current_dir, pattern)
+    })
 }
 
 fn should_show_for_os(os_filter: &Option<String>) -> bool {
-    let Some(filter) = os_filter else {
+    if os_filter.is_none() {
         return true;
-    };
-
-    let current_os = get_current_os();
-
-    for os_rule in filter.split(',').map(str::trim) {
-        if let Some(excluded_os) = os_rule.strip_prefix('!') {
-            if current_os == excluded_os {
-                return false;
-            }
-        } else if current_os == os_rule {
-            return true;
-        }
     }
 
-    !filter.split(',').any(|s| !s.trim().starts_with('!'))
+    let current_os = get_current_os();
+    should_show(os_filter, |rule| rule == current_os)
 }
 
 fn get_current_hostname() -> String {
@@ -253,41 +274,16 @@ fn get_current_hostname() -> String {
 }
 
 fn should_show_for_hostname(hostname_filter: &Option<String>) -> bool {
-    let Some(filter) = hostname_filter else {
+    if hostname_filter.is_none() {
         return true;
-    };
-
-    let current_hostname = get_current_hostname();
-
-    for hostname_rule in filter.split(',').map(str::trim) {
-        if let Some(excluded_hostname) = hostname_rule.strip_prefix('!') {
-            if current_hostname == excluded_hostname {
-                return false;
-            }
-        } else if current_hostname == hostname_rule {
-            return true;
-        }
     }
 
-    !filter.split(',').any(|s| !s.trim().starts_with('!'))
+    let current_hostname = get_current_hostname();
+    should_show(hostname_filter, |rule| rule == current_hostname)
 }
 
 fn should_show_for_env(env_filter: &Option<String>) -> bool {
-    let Some(filter) = env_filter else {
-        return true;
-    };
-
-    for env_rule in filter.split(',').map(str::trim) {
-        if let Some(excluded_env) = env_rule.strip_prefix('!') {
-            if env::var(excluded_env).is_ok() {
-                return false;
-            }
-        } else if env::var(env_rule).is_ok() {
-            return true;
-        }
-    }
-
-    !filter.split(',').any(|s| !s.trim().starts_with('!'))
+    should_show(env_filter, |rule| env::var(rule).is_ok())
 }
 
 fn gen_lists(tag_rules: &str) -> FilterOpts {
