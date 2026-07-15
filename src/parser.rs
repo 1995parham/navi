@@ -170,19 +170,44 @@ fn get_current_os() -> String {
     std::env::consts::OS.to_string()
 }
 
+/// Translates a glob pattern into an anchored regex, where `**` matches across
+/// path separators and `*` matches within a single component. Everything else is
+/// escaped, so a pattern such as `**/.git/**` matches a literal dot rather than
+/// any character.
+fn glob_to_regex(pattern: &str) -> String {
+    let mut out = String::with_capacity(pattern.len() * 2);
+    let mut literal = String::new();
+    out.push('^');
+
+    let mut chars = pattern.chars().peekable();
+    while let Some(c) = chars.next() {
+        if c != '*' {
+            literal.push(c);
+            continue;
+        }
+        if !literal.is_empty() {
+            out.push_str(&regex::escape(&literal));
+            literal.clear();
+        }
+        if chars.peek() == Some(&'*') {
+            chars.next();
+            out.push_str(".*");
+        } else {
+            out.push_str("[^/]*");
+        }
+    }
+
+    if !literal.is_empty() {
+        out.push_str(&regex::escape(&literal));
+    }
+    out.push('$');
+    out
+}
+
 fn matches_path_pattern(current_dir: &str, pattern: &str) -> bool {
-    let pattern = pattern.trim();
-
-    let pattern_regex = pattern
-        .replace("**", "DOUBLE_STAR")
-        .replace('*', "[^/]*")
-        .replace("DOUBLE_STAR", ".*");
-
-    let Ok(re) = Regex::new(&format!("^{}$", pattern_regex)) else {
-        return false;
-    };
-
-    re.is_match(current_dir)
+    Regex::new(&glob_to_regex(pattern.trim()))
+        .map(|re| re.is_match(current_dir))
+        .unwrap_or(false)
 }
 
 fn should_show_for_path(path_filter: &Option<String>) -> bool {
@@ -539,6 +564,32 @@ mod tests {
         let out = parse("% demo\n\n# alpha\necho alpha\n\n# bravo\necho bravo\n");
         assert!(out.contains("alpha"), "got: {out}");
         assert!(out.contains("bravo"), "got: {out}");
+    }
+
+    #[test]
+    fn test_glob_patterns_escape_regex_metacharacters() {
+        // A literal dot must not behave as a regex wildcard.
+        assert!(matches_path_pattern("/home/me/.git/hooks", "**/.git/**"));
+        assert!(!matches_path_pattern("/home/me/agit/src", "**/.git/**"));
+        assert!(!matches_path_pattern(
+            "/home/parham/Xconfig",
+            "/home/parham/.config"
+        ));
+        assert!(matches_path_pattern(
+            "/home/parham/.config",
+            "/home/parham/.config"
+        ));
+
+        // Regex metacharacters in a path must match literally rather than
+        // failing to compile and silently never matching.
+        assert!(matches_path_pattern("/home/u/proj(1)", "/home/u/proj(1)"));
+        assert!(matches_path_pattern("/home/u/a+b", "/home/u/a+b"));
+        assert!(matches_path_pattern("/home/u/a+b/src", "**/a+b/**"));
+        assert!(!matches_path_pattern("/home/u/aab", "/home/u/a+b"));
+
+        // The old implementation used a `DOUBLE_STAR` placeholder that a
+        // pattern could smuggle in.
+        assert!(!matches_path_pattern("/x/anything", "/x/DOUBLE_STAR"));
     }
 
     #[test]
