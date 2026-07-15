@@ -132,6 +132,31 @@ pub struct Parser<'a> {
     writer: &'a mut dyn Write,
 }
 
+/// Filters declared by `; path:`/`; os:`/`; hostname:`/`; env:` metacomments.
+///
+/// A metacomment always precedes the `#` comment of the item it applies to, so
+/// the filters are buffered here and moved onto the item only once that item
+/// starts. Assigning them on sight would attach them to the item currently being
+/// accumulated, i.e. the previous one.
+#[derive(Default)]
+struct PendingFilters {
+    path: Option<String>,
+    os: Option<String>,
+    hostname: Option<String>,
+    env: Option<String>,
+}
+
+impl PendingFilters {
+    /// Moves the buffered filters onto `item`, clearing whatever the previous
+    /// item left behind so that filters never leak forwards.
+    fn apply_to(&mut self, item: &mut Item) {
+        item.path_filter = self.path.take();
+        item.os_filter = self.os.take();
+        item.hostname_filter = self.hostname.take();
+        item.env_filter = self.env.take();
+    }
+}
+
 fn without_first(string: &str) -> String {
     string
         .char_indices()
@@ -349,6 +374,8 @@ impl<'a> Parser<'a> {
 
         let mut variable_cmd = String::from("");
 
+        let mut pending = PendingFilters::default();
+
         for (line_nr, line_result) in lines.enumerate() {
             let line = line_result.with_context(|| {
                 format!("Failed to read line number {line_nr} in cheatsheet `{id}`")
@@ -357,9 +384,6 @@ impl<'a> Parser<'a> {
             if should_break {
                 break;
             }
-
-            // duplicate
-            // if !item.tags.is_empty() && !item.comment.is_empty() {}
 
             // blank
             if line.is_empty() {
@@ -372,6 +396,7 @@ impl<'a> Parser<'a> {
                 should_break = self.write_cmd(&item).is_err();
                 item.snippet = String::from("");
                 item.tags = without_prefix(&line);
+                pending.apply_to(&mut item);
             }
             // dependency
             else if line.starts_with('@') {
@@ -381,19 +406,19 @@ impl<'a> Parser<'a> {
             }
             // path filter
             else if let Some(path) = line.strip_prefix("; path:") {
-                item.path_filter = Some(path.trim().into());
+                pending.path = Some(path.trim().into());
             }
             // os filter
             else if let Some(os) = line.strip_prefix("; os:") {
-                item.os_filter = Some(os.trim().into());
+                pending.os = Some(os.trim().into());
             }
             // hostname filter
             else if let Some(hostname) = line.strip_prefix("; hostname:") {
-                item.hostname_filter = Some(hostname.trim().into());
+                pending.hostname = Some(hostname.trim().into());
             }
             // env filter
             else if let Some(env) = line.strip_prefix("; env:") {
-                item.env_filter = Some(env.trim().into());
+                pending.env = Some(env.trim().into());
             }
             // metacomment
             else if line.starts_with(';') {
@@ -403,6 +428,7 @@ impl<'a> Parser<'a> {
                 should_break = self.write_cmd(&item).is_err();
                 item.snippet = String::from("");
                 item.comment = without_prefix(&line);
+                pending.apply_to(&mut item);
             }
             // variable
             else if !variable_cmd.is_empty() || (line.starts_with('$') && line.contains(':')) {
@@ -450,6 +476,70 @@ impl<'a> Parser<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Runs `read_lines` over a cheatsheet and returns everything the parser
+    /// wrote out, so that filtering can be asserted end-to-end rather than only
+    /// through the `should_show_*` helpers.
+    fn parse(text: &str) -> String {
+        let mut buf: Vec<u8> = Vec::new();
+        {
+            let mut parser = Parser::with_filter(&mut buf, FilterOpts::default());
+            let lines = text.lines().map(|l| Ok(l.to_string()));
+            parser
+                .read_lines(lines, "test", None)
+                .expect("parsing failed");
+        }
+        String::from_utf8(buf).expect("output is not utf8")
+    }
+
+    #[test]
+    fn test_filter_applies_to_the_item_it_precedes() {
+        let current_os = get_current_os();
+        let text = format!(
+            "% demo\n\n; os: plan9\n# alpha\necho alpha\n\n; os: {current_os}\n# bravo\necho bravo\n"
+        );
+        let out = parse(&text);
+
+        assert!(
+            !out.contains("alpha"),
+            "a snippet for another OS must stay hidden, got: {out}"
+        );
+        assert!(
+            out.contains("bravo"),
+            "a snippet for the current OS must be shown, got: {out}"
+        );
+    }
+
+    #[test]
+    fn test_filters_do_not_leak_onto_later_items() {
+        let text = "% demo\n\n; os: plan9\n# alpha\necho alpha\n\n# bravo\necho bravo\n";
+        let out = parse(text);
+
+        assert!(!out.contains("alpha"), "got: {out}");
+        assert!(
+            out.contains("bravo"),
+            "an item without filters must not inherit the previous item's, got: {out}"
+        );
+    }
+
+    #[test]
+    fn test_filters_do_not_leak_across_tag_blocks() {
+        let text = "% one\n\n; os: plan9\n# alpha\necho alpha\n\n% two\n\n# bravo\necho bravo\n";
+        let out = parse(text);
+
+        assert!(!out.contains("alpha"), "got: {out}");
+        assert!(
+            out.contains("bravo"),
+            "a new tag block must start with no inherited filters, got: {out}"
+        );
+    }
+
+    #[test]
+    fn test_unfiltered_cheatsheet_is_unaffected() {
+        let out = parse("% demo\n\n# alpha\necho alpha\n\n# bravo\necho bravo\n");
+        assert!(out.contains("alpha"), "got: {out}");
+        assert!(out.contains("bravo"), "got: {out}");
+    }
 
     #[test]
     fn test_parse_variable_line() {
