@@ -27,8 +27,22 @@ A cheatsheet can have the following elements:
 
 ## Filtering Commands
 
-Navi allows you to filter commands based on operating system, path, and hostname using metacomments.
+Navi allows you to filter commands based on operating system, path, hostname and
+environment variables using metacomments.
 This is useful for creating cross-platform cheatsheets or context-specific commands.
+
+A filter metacomment applies to the command whose `#` comment comes immediately
+after it, and to that command only — filters are not inherited by the commands
+that follow:
+
+```sh
+; os: linux
+# Only shown on Linux
+echo linux
+
+# Shown everywhere, because the filter above applies to the command before it
+echo everywhere
+```
 
 ### OS-based filtering
 
@@ -79,9 +93,13 @@ git status
 docker ps -a
 ```
 
-**Pattern syntax:** Supports glob patterns like `**/.git/**`, `**/projects/**`, etc.
+**Pattern syntax:** `*` matches within a single path component, while `**` matches
+across separators. Every other character — including `.` — is matched literally,
+so `**/.git/**` matches `.git` directories but not `agit`.
 
 **Multiple paths:** Separate multiple path patterns with commas
+
+**Negation:** Use a `!` prefix to exclude a directory (e.g., `; path: !**/secret/**`)
 
 ### Hostname-based filtering
 
