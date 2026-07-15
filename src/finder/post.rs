@@ -42,6 +42,12 @@ _navi_input | _navi_map_fn | _navi_nonewline"#
 
 fn get_column(text: String, column: Option<u8>, delimiter: Option<&str>) -> Result<String> {
     if let Some(c) = column {
+        // Columns are 1-indexed. `--column 0` would otherwise underflow here.
+        let index = c
+            .checked_sub(1)
+            .context("Column numbers are 1-indexed, so `0` is not a valid column")?
+            as usize;
+
         let mut result = String::from("");
         let re = regex::Regex::new(delimiter.unwrap_or(r"\s\s+"))
             .context("Invalid delimiter regex pattern")?;
@@ -49,11 +55,10 @@ fn get_column(text: String, column: Option<u8>, delimiter: Option<&str>) -> Resu
             if (line).is_empty() {
                 continue;
             }
-            let mut parts = re.split(line).skip((c - 1) as usize);
             if !result.is_empty() {
                 result.push('\n');
             }
-            result.push_str(parts.next().unwrap_or(""));
+            result.push_str(re.split(line).nth(index).unwrap_or(""));
         }
         Ok(result)
     } else {

@@ -52,11 +52,15 @@ fn parse_opts(text: &str) -> Result<FinderOpts> {
                             .context("Value for `--headers` is invalid u8")?
                     }
                     "--column" => {
-                        opts.column = Some(
-                            value
-                                .parse::<u8>()
-                                .context("Value for `--column` is invalid u8")?,
-                        )
+                        let column = value
+                            .parse::<u8>()
+                            .context("Value for `--column` is invalid u8")?;
+                        if column == 0 {
+                            return Err(anyhow!(
+                                "Value for `--column` must be 1 or greater, as columns are 1-indexed"
+                            ));
+                        }
+                        opts.column = Some(column)
                     }
                     "--map" => opts.map = Some(value.to_string()),
                     "--delimiter" => opts.delimiter = Some(value.to_string()),
