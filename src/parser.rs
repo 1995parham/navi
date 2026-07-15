@@ -111,12 +111,13 @@ fn parse_variable_line(line: &str) -> Result<(&str, &str, Option<FinderOpts>)> {
     Ok((variable, command, command_options))
 }
 
+/// Strips the single-character line marker (`%`, `#` or `@`) and the surrounding
+/// whitespace. Operates on chars rather than bytes so that multi-byte markers'
+/// neighbours are never split mid-codepoint.
 fn without_prefix(line: &str) -> String {
-    if line.len() > 2 {
-        String::from(line[2..].trim())
-    } else {
-        String::from("")
-    }
+    let mut chars = line.chars();
+    chars.next();
+    chars.as_str().trim().to_string()
 }
 
 #[derive(Clone, Default)]
@@ -155,15 +156,6 @@ impl PendingFilters {
         item.hostname_filter = self.hostname.take();
         item.env_filter = self.env.take();
     }
-}
-
-fn without_first(string: &str) -> String {
-    string
-        .char_indices()
-        .next()
-        .and_then(|(i, _)| string.get(i + 1..))
-        .unwrap_or("")
-        .to_string()
 }
 
 fn get_current_os() -> String {
@@ -286,20 +278,23 @@ fn should_show_for_env(env_filter: &Option<String>) -> bool {
     should_show(env_filter, |rule| env::var(rule).is_ok())
 }
 
+/// Splits `--tag-rules` into an allowlist and a denylist, where a `!` prefix
+/// denies a tag. Rules are trimmed, so `git, !checkout` behaves the same as
+/// `git,!checkout`.
 fn gen_lists(tag_rules: &str) -> FilterOpts {
-    let words: Vec<_> = tag_rules.split(',').collect();
+    let mut allowlist = Vec::new();
+    let mut denylist = Vec::new();
 
-    let allowlist = words
-        .iter()
-        .filter(|w| !w.starts_with('!'))
-        .map(|w| w.to_string())
-        .collect();
-
-    let denylist = words
-        .iter()
-        .filter(|w| w.starts_with('!'))
-        .map(|w| without_first(w))
-        .collect();
+    for rule in tag_rules
+        .split(',')
+        .map(str::trim)
+        .filter(|r| !r.is_empty())
+    {
+        match rule.strip_prefix('!') {
+            Some(denied) => denylist.push(denied.trim().to_string()),
+            None => allowlist.push(rule.to_string()),
+        }
+    }
 
     FilterOpts {
         allowlist,
@@ -560,6 +555,33 @@ mod tests {
         let out = parse("% demo\n\n# alpha\necho alpha\n\n# bravo\necho bravo\n");
         assert!(out.contains("alpha"), "got: {out}");
         assert!(out.contains("bravo"), "got: {out}");
+    }
+
+    #[test]
+    fn test_without_prefix() {
+        assert_eq!(without_prefix("# Hello"), "Hello");
+        assert_eq!(without_prefix("% git, docker"), "git, docker");
+        // No space after the marker: the whole word must survive.
+        assert_eq!(without_prefix("#Hello"), "Hello");
+        // Multi-byte characters must not be split mid-codepoint.
+        assert_eq!(without_prefix("#é unicode"), "é unicode");
+        assert_eq!(without_prefix("#é"), "é");
+        assert_eq!(without_prefix("#"), "");
+        assert_eq!(without_prefix(""), "");
+    }
+
+    #[test]
+    fn test_gen_lists_trims_whitespace() {
+        // Spaces around rules must not turn a denial into an allowance.
+        for rules in ["git,!checkout", "git, !checkout", " git , ! checkout "] {
+            let opts = gen_lists(rules);
+            assert_eq!(opts.allowlist, vec!["git".to_string()], "rules: {rules:?}");
+            assert_eq!(
+                opts.denylist,
+                vec!["checkout".to_string()],
+                "rules: {rules:?}"
+            );
+        }
     }
 
     #[test]
