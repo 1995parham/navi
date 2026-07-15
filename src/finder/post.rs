@@ -1,7 +1,6 @@
 use crate::common::shell;
 use crate::finder::structures::SuggestionType;
 use crate::prelude::*;
-use shell::EOF;
 use std::process::Stdio;
 
 fn apply_map(text: String, map_fn: Option<String>) -> Result<String> {
@@ -9,11 +8,12 @@ fn apply_map(text: String, map_fn: Option<String>) -> Result<String> {
         let cmd = if CONFIG.shell().contains("fish") {
             format!(r#"printf "%s" "{text}" | {m}"#)
         } else {
+            let eof = shell::heredoc_delimiter(&text);
             format!(
                 r#"_navi_input() {{
-cat <<'{EOF}'
+cat <<'{eof}'
 {text}
-{EOF}
+{eof}
 }}
 
 _navi_map_fn() {{

@@ -1,7 +1,6 @@
 use crate::common::shell::{self, ShellSpawnError};
 use crate::prelude::*;
 use anyhow::Result;
-use shell::EOF;
 
 pub fn open(args: Vec<String>) -> Result<()> {
     let url = args
@@ -23,12 +22,13 @@ _open_url() {
         exit 55
     fi
 }"#;
+    let eof = shell::heredoc_delimiter(&url);
     let cmd = format!(
         r#"{code}
-                
-read -r -d '' url <<'{EOF}'
+
+read -r -d '' url <<'{eof}'
 {url}
-{EOF}
+{eof}
 
 _open_url "$url""#,
     );

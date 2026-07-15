@@ -1,4 +1,4 @@
-use crate::common::shell::{self, EOF, ShellSpawnError};
+use crate::common::shell::{self, ShellSpawnError};
 use crate::prelude::*;
 
 pub fn copy(text: String) -> Result<()> {
@@ -19,13 +19,15 @@ _copy() {
    fi
 }"#;
 
+    let eof = shell::heredoc_delimiter(&text);
+
     shell::out()?
         .arg(
             format!(
                 r#"{cmd}
-        read -r -d '' x <<'{EOF}'
+        read -r -d '' x <<'{eof}'
 {text}
-{EOF}
+{eof}
 
 echo -n "$x" | _copy"#,
             )
