@@ -25,8 +25,10 @@ fn ask_if_should_import_all() -> Result<bool> {
 }
 
 pub fn main(uri: String) -> Result<()> {
+    // Validate the URI before prompting, so that a typo fails immediately
+    // instead of after the user has answered questions.
+    let (actual_uri, user, repo) = git::meta(uri.as_str())?;
     let should_import_all = ask_if_should_import_all().unwrap_or(false);
-    let (actual_uri, user, repo) = git::meta(uri.as_str());
 
     let cheat_pathbuf = filesystem::default_cheat_pathbuf()?;
     let tmp_pathbuf = filesystem::tmp_pathbuf()?;
