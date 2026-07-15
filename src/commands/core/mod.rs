@@ -18,7 +18,7 @@ pub fn init(fetcher: Box<dyn Fetcher>) -> Result<()> {
     // let fetcher = config.fetcher();
 
     let (raw_selection, (variables, files)) = crate::finder::call(opts, |writer| {
-        let mut parser = Parser::new(writer, true);
+        let mut parser = Parser::new(writer);
 
         let found_something = fetcher
             .fetch(&mut parser)

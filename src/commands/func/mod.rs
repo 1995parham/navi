@@ -2,7 +2,6 @@ mod map;
 mod widget;
 
 use super::core;
-use super::temp;
 use crate::common::url;
 use crate::prelude::*;
 use clap::Args;
@@ -18,8 +17,6 @@ pub enum Func {
     WidgetLastCommand,
     #[value(name = "map::expand")]
     MapExpand,
-    #[value(name = "temp")]
-    Temp,
 }
 
 #[derive(Debug, Clone, Args)]
@@ -41,7 +38,6 @@ impl Runnable for Input {
             Func::Welcome => core::main(),
             Func::WidgetLastCommand => widget::last_command(),
             Func::MapExpand => map::expand(),
-            Func::Temp => temp::main(),
         }
     }
 }

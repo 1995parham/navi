@@ -123,7 +123,6 @@ fn without_prefix(line: &str) -> String {
 pub struct FilterOpts {
     pub allowlist: Vec<String>,
     pub denylist: Vec<String>,
-    pub hash: Option<u64>,
 }
 
 pub struct Parser<'a> {
@@ -131,7 +130,6 @@ pub struct Parser<'a> {
     visited_lines: HashSet<u64>,
     filter: FilterOpts,
     writer: &'a mut dyn Write,
-    write_fn: fn(&Item) -> String,
 }
 
 fn without_first(string: &str) -> String {
@@ -260,30 +258,26 @@ fn gen_lists(tag_rules: &str) -> FilterOpts {
     FilterOpts {
         allowlist,
         denylist,
-        ..Default::default()
     }
 }
 
 impl<'a> Parser<'a> {
-    pub fn new(writer: &'a mut dyn Write, _is_terminal: bool) -> Self {
-        let write_fn = display::terminal::write;
-
+    pub fn new(writer: &'a mut dyn Write) -> Self {
         let filter = match CONFIG.tag_rules() {
             Some(tr) => gen_lists(&tr),
             None => Default::default(),
         };
 
+        Self::with_filter(writer, filter)
+    }
+
+    fn with_filter(writer: &'a mut dyn Write, filter: FilterOpts) -> Self {
         Self {
             variables: Default::default(),
             visited_lines: Default::default(),
             filter,
-            write_fn,
             writer,
         }
-    }
-
-    pub fn set_hash(&mut self, hash: u64) {
-        self.filter.hash = Some(hash)
     }
 
     fn write_cmd(&mut self, item: &Item) -> Result<()> {
@@ -318,12 +312,6 @@ impl<'a> Parser<'a> {
             }
         }
 
-        if let Some(h) = self.filter.hash
-            && h != hash
-        {
-            return Ok(());
-        }
-
         // Filter by path
         if !should_show_for_path(&item.path_filter) {
             return Ok(());
@@ -344,10 +332,8 @@ impl<'a> Parser<'a> {
             return Ok(());
         }
 
-        let write_fn = self.write_fn;
-
         self.writer
-            .write_all(write_fn(item).as_bytes())
+            .write_all(display::terminal::write(item).as_bytes())
             .context("Failed to write command to finder's stdin")
     }
 
