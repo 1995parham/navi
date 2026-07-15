@@ -8,12 +8,11 @@ pub use post::process;
 use structures::Opts;
 use structures::SuggestionType;
 
-const MIN_FZF_VERSION_MAJOR: u32 = 0;
-const MIN_FZF_VERSION_MINOR: u32 = 23;
-const MIN_FZF_VERSION_PATCH: u32 = 1;
+/// Oldest fzf that supports the preview window layout navi asks for.
+const MIN_FZF_VERSION: (u32, u32, u32) = (0, 23, 1);
 
-const COLORFUL_FZF_VERSION_MAJOR: u32 = 0;
-const COLORFUL_FZF_VERSION_MINOR: u32 = 56;
+/// Oldest fzf that supports the `--gap`/`--style full`/`--wrap` flags.
+const COLORFUL_FZF_VERSION: (u32, u32) = (0, 56);
 
 mod post;
 
@@ -54,16 +53,21 @@ where
 {
     let finder_str = "fzf";
 
-    if let Some((major, minor, patch)) = check_fzf_version()
-        && major == MIN_FZF_VERSION_MAJOR
-        && minor < MIN_FZF_VERSION_MINOR
-        && patch < MIN_FZF_VERSION_PATCH
+    // Spawning `fzf --version` is not free, so the result is reused below.
+    let fzf_version = check_fzf_version();
+
+    // Compared as a tuple: comparing major/minor/patch independently would let
+    // any version with a non-zero patch through, however old it is.
+    if let Some(version) = fzf_version
+        && version < MIN_FZF_VERSION
     {
+        let (major, minor, patch) = version;
+        let (min_major, min_minor, min_patch) = MIN_FZF_VERSION;
         eprintln!(
-            "Warning: Fzf version {major}.{minor} does not support the preview window layout used by navi.",
+            "Warning: Fzf version {major}.{minor}.{patch} does not support the preview window layout used by navi.",
         );
         eprintln!(
-            "Consider updating Fzf to a version >= {MIN_FZF_VERSION_MAJOR}.{MIN_FZF_VERSION_MINOR}.{MIN_FZF_VERSION_PATCH} or use a compatible layout.",
+            "Consider updating Fzf to a version >= {min_major}.{min_minor}.{min_patch} or use a compatible layout.",
         );
         process::exit(1);
     }
@@ -92,8 +96,8 @@ where
         "--exact",
     ]);
 
-    if let Some((major, minor, _)) = check_fzf_version()
-        && (major > COLORFUL_FZF_VERSION_MAJOR || minor >= COLORFUL_FZF_VERSION_MINOR)
+    if let Some((major, minor, _)) = fzf_version
+        && (major, minor) >= COLORFUL_FZF_VERSION
     {
         command.args(["--gap", "--style", "full", "--wrap"]);
     }
