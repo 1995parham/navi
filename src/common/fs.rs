@@ -37,7 +37,7 @@ pub struct UnreadableDir {
 pub fn open(filename: &Path) -> Result<File> {
     File::open(filename).with_context(|| {
         let x = filename.to_string();
-        format!("Failed to open file {}", &x)
+        format!("Failed to open file {}", x)
     })
 }
 

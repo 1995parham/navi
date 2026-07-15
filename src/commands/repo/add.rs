@@ -37,7 +37,7 @@ pub fn main(uri: String) -> Result<()> {
     let _ = filesystem::remove_dir(&tmp_pathbuf);
     filesystem::create_dir(&tmp_pathbuf)?;
 
-    eprintln!("Cloning {} into {}...\n", &actual_uri, &tmp_path_str);
+    eprintln!("Cloning {} into {}...\n", actual_uri, tmp_path_str);
 
     git::shallow_clone(actual_uri.as_str(), tmp_path_str)
         .with_context(|| format!("Failed to clone `{actual_uri}`"))?;
@@ -81,7 +81,7 @@ pub fn main(uri: String) -> Result<()> {
             p
         };
         let filename = file
-            .replace(&format!("{}{}", &tmp_path_str, path::MAIN_SEPARATOR), "")
+            .replace(&format!("{}{}", tmp_path_str, path::MAIN_SEPARATOR), "")
             .replace(path::MAIN_SEPARATOR, "__");
         let to = {
             let mut p = to_folder.clone();
@@ -91,8 +91,8 @@ pub fn main(uri: String) -> Result<()> {
         fs::copy(&from, &to).with_context(|| {
             format!(
                 "Failed to copy `{}` to `{}`",
-                &from.to_string(),
-                &to.to_string()
+                from.to_string(),
+                to.to_string()
             )
         })?;
     }

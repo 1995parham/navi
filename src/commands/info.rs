@@ -46,15 +46,15 @@ impl Runnable for Input {
             ),
 
             // Here should be the old deprecated default value commands
-            Info::CheatsPath => println!("{}", &filesystem::default_cheat_pathbuf()?.to_string()),
-            Info::ConfigPath => println!("{}", &filesystem::default_config_pathbuf()?.to_string()),
+            Info::CheatsPath => println!("{}", filesystem::default_cheat_pathbuf()?.to_string()),
+            Info::ConfigPath => println!("{}", filesystem::default_config_pathbuf()?.to_string()),
 
             // Here should be the default values (computed at compile time)
             Info::DefaultCheatsPath => {
-                println!("{}", &filesystem::default_cheat_pathbuf()?.to_string())
+                println!("{}", filesystem::default_cheat_pathbuf()?.to_string())
             }
             Info::DefaultConfigPath => {
-                println!("{}", &filesystem::default_config_pathbuf()?.to_string())
+                println!("{}", filesystem::default_config_pathbuf()?.to_string())
             }
         }
         Ok(())

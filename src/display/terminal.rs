@@ -13,7 +13,7 @@ pub fn write(item: &Item) -> String {
         tags_full = item.tags,
         comment_full = item.comment,
         delimiter = DELIMITER,
-        snippet_full = &item.snippet.trim_end_matches(LINE_SEPARATOR),
+        snippet_full = item.snippet.trim_end_matches(LINE_SEPARATOR),
         file_index = item.file_index.unwrap_or(0),
     )
 }
