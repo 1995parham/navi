@@ -154,8 +154,6 @@ impl fetcher::Fetcher for Fetcher {
         let home_regex = &*HOME_REGEX;
         let home = etcetera::home_dir().ok();
 
-        // parser.filter = self.tag_rules.as_ref().map(|r| gen_lists(r.as_str()));
-
         for folder in folders {
             let interpolated_folder = match &home {
                 Some(h) => home_regex.replace(folder, h.to_string_lossy()).to_string(),
@@ -167,14 +165,15 @@ impl fetcher::Fetcher for Fetcher {
             for file in cheat_files {
                 self.files.borrow_mut().push(file.clone());
                 let index = self.files.borrow().len() - 1;
-                let read_file_result = {
-                    let path = PathBuf::from(&file);
-                    let lines = read_lines(&path)?;
-                    parser.read_lines(lines, &file, Some(index))
-                };
 
-                if read_file_result.is_ok() && !found_something {
-                    found_something = true
+                // A single unreadable or malformed cheat file must not hide
+                // every remaining one, so failures are logged and skipped.
+                let read_file_result = read_lines(&PathBuf::from(&file))
+                    .and_then(|lines| parser.read_lines(lines, &file, Some(index)));
+
+                match read_file_result {
+                    Ok(()) => found_something = true,
+                    Err(e) => warn!("Skipping cheat file `{file}`: {e:?}"),
                 }
             }
         }
