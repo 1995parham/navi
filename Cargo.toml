@@ -20,7 +20,7 @@ disable-command-execution = []
 disable-repo-management = []
 
 [dependencies]
-regex = { version = "1.12", default-features = false, features = [
+regex = { version = "1.13", default-features = false, features = [
   "std",
   "unicode-perl",
 ] }
